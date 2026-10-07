@@ -8,6 +8,7 @@ import { AmbientDashboard } from "@/components/AmbientDashboard";
 import { FinLitInterceptModal } from "@/components/FinLitInterceptModal";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { OrderConfirmationDrawer } from "@/components/OrderConfirmationDrawer";
+import { PortfolioHealthReportModal } from "@/components/PortfolioHealthReportModal";
 import { Zap } from "lucide-react";
 
 export default function Home() {
@@ -24,6 +25,8 @@ export default function Home() {
     setIsOnboardingOpen,
     isInterceptModalOpen,
     setIsInterceptModalOpen,
+    isHealthReportModalOpen,
+    setIsHealthReportModalOpen,
     riskScoreResult,
     handleSelectAlternative,
     failOpenToast,
@@ -50,7 +53,7 @@ export default function Home() {
             <div className="text-xs space-y-1">
               <div className="flex items-center space-x-2">
                 <span className="font-bold text-sm text-blue-300">
-                  Fail-Open Resilience Protocol Triggered
+                  Execution SLA Resilience Fallback Triggered
                 </span>
                 <span className="rounded bg-blue-500/20 px-2 py-0.5 font-mono text-[10px] font-bold text-blue-300">
                   ZERO UI BLOCKING
@@ -65,7 +68,7 @@ export default function Home() {
         <AmbientDashboard />
       </main>
 
-      {/* FinLit Intercept Modal (Cognitive Circuit Breaker) */}
+      {/* FinLit Intercept Modal (Cognitive Circuit Breaker with Pre-Pause AI Report) */}
       {selectedHolding && (
         <FinLitInterceptModal
           isOpen={isInterceptModalOpen}
@@ -78,7 +81,7 @@ export default function Home() {
         />
       )}
 
-      {/* Onboarding & Goal Anchoring Flow Modal */}
+      {/* Onboarding & Goal Anchoring Flow Modal (with Gemini Smart Classification) */}
       <OnboardingModal
         isOpen={isOnboardingOpen}
         onClose={() => setIsOnboardingOpen(false)}
@@ -91,6 +94,12 @@ export default function Home() {
             setSelectedGoal(newGoals[0]);
           }
         }}
+      />
+
+      {/* AI Portfolio Health & Risk Audit Report Modal (Gemini 1.5 Pro) */}
+      <PortfolioHealthReportModal
+        isOpen={isHealthReportModalOpen}
+        onClose={() => setIsHealthReportModalOpen(false)}
       />
 
       {/* Order Confirmation & Resolution Drawer */}

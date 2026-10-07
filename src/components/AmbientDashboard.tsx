@@ -19,6 +19,9 @@ import {
   Layers,
   Scissors,
   DollarSign,
+  Activity,
+  Bot,
+  FileText,
 } from "lucide-react";
 
 export const AmbientDashboard: React.FC = () => {
@@ -30,6 +33,7 @@ export const AmbientDashboard: React.FC = () => {
     isMarketCrashActive,
     handlePauseClick,
     setIsOnboardingOpen,
+    setIsHealthReportModalOpen,
     selectedGoal,
     setSelectedGoal,
   } = useApp();
@@ -87,8 +91,8 @@ export const AmbientDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 2: Compounding Health Index */}
-        <div className="rounded-3xl border border-[#282e3e] bg-[#12151d] p-5 sm:p-6 shadow-xl shadow-black/40 flex flex-col justify-between">
+        {/* Card 2: Compounding Health Index with AI Report Button */}
+        <div className="rounded-3xl border border-[#282e3e] bg-[#12151d] p-5 sm:p-6 shadow-xl shadow-black/40 flex flex-col justify-between relative overflow-hidden">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -99,11 +103,23 @@ export const AmbientDashboard: React.FC = () => {
               </span>
             </div>
 
-            <div className="mt-2.5 flex items-baseline space-x-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-calm-green-400">
-                92<span className="text-base font-normal text-slate-400">/100</span>
-              </span>
-              <span className="text-xs text-slate-400 font-medium">Habit Score</span>
+            <div className="mt-2 flex items-center justify-between">
+              <div className="flex items-baseline space-x-2">
+                <span className="text-2xl sm:text-3xl font-extrabold text-calm-green-400">
+                  92<span className="text-base font-normal text-slate-400">/100</span>
+                </span>
+                <span className="text-xs text-slate-400 font-medium">Habit</span>
+              </div>
+
+              {/* Primary AI Health Report CTA Button */}
+              <button
+                onClick={() => setIsHealthReportModalOpen(true)}
+                className="flex items-center space-x-1.5 rounded-xl bg-gradient-to-r from-[#71649C] to-calm-navy-700 px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-[#71649C]/25 hover:brightness-110 active:scale-95 transition"
+                title="Generate comprehensive AI Portfolio Health & Risk Audit Report with Gemini 1.5 Pro"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-calm-amber-300" />
+                <span>AI Health Report</span>
+              </button>
             </div>
           </div>
 
@@ -115,8 +131,8 @@ export const AmbientDashboard: React.FC = () => {
               />
             </div>
             <p className="text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Execution Regularity: <strong>{portfolio.sipRegularityScore}%</strong></span>
-              <span className="text-calm-green-400 font-medium">Unbroken</span>
+              <span>Regularity: <strong>{portfolio.sipRegularityScore}%</strong></span>
+              <span className="text-calm-green-400 font-medium">Unbroken Mandates</span>
             </p>
           </div>
         </div>
@@ -168,10 +184,10 @@ export const AmbientDashboard: React.FC = () => {
 
             <div className="mt-2">
               <span className="text-lg sm:text-xl font-bold text-white block truncate">
-                {archetypeInfo.title}
+                {profile.archetype || archetypeInfo.title}
               </span>
               <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">
-                {archetypeInfo.tagline}
+                {profile.aiProfileSummary || archetypeInfo.tagline}
               </p>
             </div>
           </div>
@@ -185,7 +201,7 @@ export const AmbientDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Contrarian Rupee Cost Averaging Guidance Banner (If Market Dip is Active) */}
+      {/* Contrarian Rupee Cost Averaging Guidance Banner */}
       {isMarketCrashActive && (
         <div className="rounded-3xl border border-[#71649C]/40 bg-gradient-to-r from-[#71649C]/15 via-[#161a24] to-[#12151d] p-5 sm:p-6 shadow-xl text-slate-200">
           <div className="flex items-start space-x-3.5">
@@ -195,7 +211,7 @@ export const AmbientDashboard: React.FC = () => {
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-bold text-slate-100 text-sm sm:text-base">
-                  Virtual Accountant Contrarian Insight
+                  Quantitative Co-Pilot Contrarian Insight
                 </span>
                 <span className="rounded-full bg-calm-amber-500/20 border border-calm-amber-500/40 px-2 py-0.5 text-[10px] font-bold text-calm-amber-300 uppercase">
                   Units on 12.6% Discount
@@ -303,7 +319,7 @@ export const AmbientDashboard: React.FC = () => {
               Active Monthly SIP Mandates
             </h3>
             <p className="text-xs text-slate-400">
-              Click &quot;Pause SIP&quot; on any holding to experience the FinLit Cognitive Circuit Breaker.
+              Click &quot;Pause SIP&quot; on any holding to experience the FinLit Cognitive Circuit Breaker with Gemini AI insights.
             </p>
           </div>
           <div className="flex items-center space-x-2 text-xs font-mono text-slate-400">

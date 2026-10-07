@@ -28,6 +28,8 @@ import {
   Lock,
   X,
   Zap,
+  Bot,
+  RefreshCw,
 } from "lucide-react";
 
 interface FinLitInterceptModalProps {
@@ -61,9 +63,75 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
   const [showTlhBreakdown, setShowTlhBreakdown] = useState<boolean>(false);
   const [showMathInspector, setShowMathInspector] = useState<boolean>(false);
 
+  // Gemini AI Consequence Report State
+  const [aiReport, setAiReport] = useState<string>("");
+  const [isAiLoading, setIsAiLoading] = useState<boolean>(true);
+  const [aiModelUsed, setAiModelUsed] = useState<string>("gemini-1.5-flash");
+
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Reset countdown and friction timer whenever modal opens
+  // Dynamic calculated metrics
+  const rcaPercentage = riskResult?.xaiAudit.rcaUnitDiscountPct || 14.5;
+  const currentUnitsPurchased = ((holding?.monthlyAmount || 15000) / (holding?.currentNav || 88.4)).toFixed(2);
+  const avgUnitsPurchased = ((holding?.monthlyAmount || 15000) / (holding?.avgNav || 101.2)).toFixed(2);
+  const stepDownMonthlyAmount = Math.round((holding?.monthlyAmount || 15000) * 0.5);
+
+  const estimatedDelayMonths = Math.max(
+    1,
+    Math.round((riskResult?.xaiAudit.projectedMilestoneDelayMonths || 3) * (pauseMonths / 3))
+  );
+
+  const dynamicDeficit = Math.round(
+    (riskResult?.xaiAudit.calculatedDeficit3Months || 99583) * (pauseMonths / 3)
+  );
+
+  // Fetch AI Consequence Report via Gemini 1.5 Flash
+  const fetchAiPrePauseReport = async () => {
+    if (!holding || !goal || !riskResult) return;
+    setIsAiLoading(true);
+
+    try {
+      const payload = {
+        fundName: holding.fundName,
+        monthlyAmount: holding.monthlyAmount,
+        currentNav: holding.currentNav,
+        avgNav: holding.avgNav,
+        rcaUnitDiscountPct: rcaPercentage,
+        goalTitle: goal.title,
+        goalYear: goal.targetYear,
+        targetCorpus: goal.targetAmount,
+        pauseMonths,
+        projectedMilestoneDelayMonths: estimatedDelayMonths,
+        calculatedDeficit: dynamicDeficit,
+        currentDrawdownPct: -7.5,
+        vix: 14.8,
+      };
+
+      const res = await fetch("/api/ai/pre-pause-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setAiReport(data.report);
+        setAiModelUsed(data.modelUsed || "gemini-1.5-flash");
+      } else {
+        throw new Error("API error");
+      }
+    } catch (e) {
+      console.warn("AI Pre-pause report fetch error:", e);
+      setAiReport(
+        `• **Rupee Cost Averaging Penalty:** Halting your ₹${holding.monthlyAmount.toLocaleString("en-IN")} contribution forfeits acquiring fund units at a **+${rcaPercentage}% unit discount** (NAV ₹${holding.currentNav.toFixed(2)} vs 6-month avg ₹${holding.avgNav.toFixed(2)}).\n• **Milestone Timeline Fracture:** Pausing for ${pauseMonths} months creates a **-₹${dynamicDeficit.toLocaleString("en-IN")} compounded deficit**, directly delaying your **${goal.title} (${goal.targetYear}) by ~${estimatedDelayMonths} months**.\n• **Pro Wealth Recommendation:** Instead of an outright pause, activate the **Step-Down SIP (₹${stepDownMonthlyAmount.toLocaleString("en-IN")}/mo)** to alleviate cashflow while preserving over 70% of your compounding trajectory.`
+      );
+      setAiModelUsed("deterministic-math-engine");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  // Reset countdown, friction timer, and trigger AI report on open
   useEffect(() => {
     if (isOpen) {
       setCountdown(3);
@@ -71,6 +139,8 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
       setIsCashflowEmergency(null);
       setShowLiquidityDiagnostic(false);
       setShowTlhBreakdown(false);
+
+      fetchAiPrePauseReport();
 
       const timer = setInterval(() => {
         setCountdown((prev) => {
@@ -85,23 +155,12 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
 
       return () => clearInterval(timer);
     }
-  }, [isOpen]);
+  }, [isOpen, pauseMonths]);
 
   if (!isOpen || !riskResult) return null;
 
   // TLH Calculation
   const tlh = FinLitMathEngine.calculateTaxLossHarvesting(holding);
-
-  const rcaPercentage = riskResult.xaiAudit.rcaUnitDiscountPct;
-  const currentUnitsPurchased = (holding.monthlyAmount / holding.currentNav).toFixed(2);
-  const avgUnitsPurchased = (holding.monthlyAmount / holding.avgNav).toFixed(2);
-  const stepDownMonthlyAmount = Math.round(holding.monthlyAmount * 0.5);
-
-  // Calculate dynamic impact based on selected pause months
-  const estimatedDelayMonths = Math.max(
-    1,
-    Math.round(riskResult.xaiAudit.projectedMilestoneDelayMonths * (pauseMonths / 3))
-  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
@@ -121,7 +180,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
                   Cognitive Circuit Breaker
                 </span>
                 <span className="rounded-full bg-[#1e2433] border border-[#282e3e] px-2.5 py-0.5 text-[11px] font-mono text-slate-300">
-                  Sub-200ms Latency: {riskResult.latencyMs}ms
+                  Execution Latency: {riskResult.latencyMs}ms
                 </span>
               </div>
               <h2 className="mt-1.5 text-xl sm:text-2xl font-extrabold tracking-tight text-slate-100">
@@ -154,7 +213,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
                 <span className="text-calm-amber-300">{goal.title}</span> by ~{estimatedDelayMonths} months
               </div>
               <p className="text-xs text-slate-300 leading-relaxed pt-0.5">
-                During market dips, pausing prevents you from acquiring fund units at discounted prices, forcing you to invest more money later to hit the same ₹{(goal.targetAmount / 100000).toFixed(1)} Lakh target.
+                During market drawdowns, pausing halts buying units at discounted prices, creating a <strong>-₹{dynamicDeficit.toLocaleString("en-IN")} compounded deficit</strong> at your {goal.targetYear} milestone horizon.
               </p>
             </div>
 
@@ -188,27 +247,70 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
           </div>
         )}
 
-        {/* Explainable AI (XAI) Rupee Cost Averaging Fact */}
-        <div className="mt-4 rounded-2xl border border-calm-navy-600/60 bg-calm-navy-900/30 p-4">
-          <div className="flex items-center space-x-2 text-xs font-semibold text-calm-amber-400 uppercase tracking-wide">
-            <Sparkles className="h-4 w-4" />
-            <span>Explainable AI (XAI) Unit Accumulation Fact</span>
+        {/* FEATURE 3A: Pre-Pause AI Consequence Report Panel (Gemini 1.5 Flash) */}
+        <div className="mt-4 rounded-2xl border border-[#71649C] bg-gradient-to-r from-[#71649C]/20 via-[#161a24] to-[#12151d] p-4 sm:p-5 shadow-xl shadow-[#71649C]/10 relative overflow-hidden">
+          <div className="flex items-center justify-between border-b border-[#38425d] pb-2.5 mb-3">
+            <div className="flex items-center space-x-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#71649C]/30 text-purple-200">
+                <Sparkles className="h-3.5 w-3.5" />
+              </div>
+              <span className="text-xs font-bold text-purple-200 uppercase tracking-wider">
+                Pre-Pause AI Consequence Analysis
+              </span>
+              <span className="rounded-full bg-[#71649C]/30 border border-[#71649C]/60 px-2 py-0.2 text-[9px] font-mono font-bold text-purple-300 uppercase">
+                {aiModelUsed}
+              </span>
+            </div>
+
+            <button
+              onClick={fetchAiPrePauseReport}
+              disabled={isAiLoading}
+              className="text-[11px] text-purple-300 hover:text-white flex items-center gap-1 transition"
+              title="Refresh AI analysis"
+            >
+              <RefreshCw className={`h-3 w-3 ${isAiLoading ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
           </div>
-          <p className="mt-1.5 text-sm text-slate-200 font-medium leading-relaxed">
-            &ldquo;Your <span className="text-calm-amber-300 font-bold font-mono">₹{holding.monthlyAmount.toLocaleString("en-IN")}</span> monthly contribution acquires{" "}
-            <span className="text-calm-green-400 font-bold font-mono">+{rcaPercentage}% more units</span> today ({currentUnitsPurchased} units @ ₹{holding.currentNav}) compared to your 6-month average NAV ({avgUnitsPurchased} units @ ₹{holding.avgNav}).&rdquo;
-          </p>
-          <div className="mt-2 flex flex-wrap items-center gap-2.5 text-xs text-slate-400 font-mono">
-            <span className="bg-[#14171f] px-2.5 py-1 rounded-lg border border-[#282e3e]">
-              Current Discounted NAV: ₹{holding.currentNav.toFixed(2)}
-            </span>
-            <span className="bg-[#14171f] px-2.5 py-1 rounded-lg border border-[#282e3e]">
-              6-Month Avg NAV: ₹{holding.avgNav.toFixed(2)}
-            </span>
-            <span className="text-calm-green-400 font-medium">
-              Rupee Cost Averaging in effect
-            </span>
-          </div>
+
+          {isAiLoading ? (
+            <div className="py-4 space-y-2 text-xs">
+              <div className="flex items-center space-x-2 text-purple-300 font-medium">
+                <div className="h-3.5 w-3.5 rounded-full border-2 border-purple-400 border-t-transparent animate-spin" />
+                <span>Gemini 1.5 Flash analyzing actuarial compounding impact on your {goal.title}...</span>
+              </div>
+              <div className="space-y-1.5 pt-1">
+                <div className="h-3.5 bg-[#202638] rounded-full animate-pulse w-full" />
+                <div className="h-3.5 bg-[#202638] rounded-full animate-pulse w-5/6" />
+                <div className="h-3.5 bg-[#202638] rounded-full animate-pulse w-3/4" />
+              </div>
+            </div>
+          ) : (
+            <div className="text-xs sm:text-sm text-slate-200 leading-relaxed space-y-2 font-sans">
+              {aiReport.split("\n").map((line, idx) => {
+                const clean = line.replace(/^[•\-*]\s*/, "");
+                if (!clean.trim()) return null;
+                const parts = clean.split(/(\*\*[^*]+\*\*)/g);
+                return (
+                  <div key={idx} className="flex items-start space-x-2">
+                    <span className="text-calm-amber-400 font-bold mt-0.5">•</span>
+                    <p className="text-slate-200">
+                      {parts.map((p, pIdx) => {
+                        if (p.startsWith("**") && p.endsWith("**")) {
+                          return (
+                            <strong key={pIdx} className="text-white font-bold">
+                              {p.slice(2, -2)}
+                            </strong>
+                          );
+                        }
+                        return p;
+                      })}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Interactive Deficit Simulator SVG (Micro-slider from 1 to 6 months) */}

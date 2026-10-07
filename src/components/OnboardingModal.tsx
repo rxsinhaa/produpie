@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BehavioralProfile, LifeGoal } from "@/types";
 import { ONBOARDING_QUESTIONS, getFriendlyArchetypeInfo } from "@/lib/constants";
 import {
@@ -17,6 +17,8 @@ import {
   Compass,
   Smile,
   Zap,
+  RefreshCw,
+  Cpu,
 } from "lucide-react";
 
 interface OnboardingModalProps {
@@ -45,13 +47,24 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     }
   );
 
+  // Gemini Smart Classification State
+  const [isClassifying, setIsClassifying] = useState<boolean>(false);
+  const [aiClassification, setAiClassification] = useState<{
+    archetypeTitle: string;
+    badge: string;
+    psychologicalProfile: string;
+    behavioralStrength: string;
+    riskMitigationRule: string;
+    riskBarrierScore: number;
+  } | null>(null);
+
   if (!isOpen) return null;
 
   const handleSelectAnswer = (qId: string, weight: number) => {
     setAnswers((prev) => ({ ...prev, [qId]: weight }));
   };
 
-  // Calculate Continuous Risk Barrier from Answers (preserves underlying math)
+  // Deterministic math score as anchor
   const calculateBarrier = () => {
     const weights = Object.values(answers);
     if (weights.length === 0) return 0.6;
@@ -60,7 +73,49 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const calculatedRiskBarrier = calculateBarrier();
-  const archetypeInfo = getFriendlyArchetypeInfo(calculatedRiskBarrier);
+  const fallbackArchetype = getFriendlyArchetypeInfo(calculatedRiskBarrier);
+
+  // Trigger Gemini AI Classification when advancing to Step 3
+  const fetchAiArchetype = async () => {
+    setIsClassifying(true);
+    try {
+      const payload = {
+        userName: profile.name || "Rouneet Raj Sinha",
+        answers,
+        goals: userGoals,
+      };
+
+      const res = await fetch("/api/ai/archetype-classification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setAiClassification(data);
+      } else {
+        throw new Error("Failed to classify archetype");
+      }
+    } catch (e) {
+      console.warn("AI Archetype classification fallback:", e);
+      setAiClassification({
+        archetypeTitle: fallbackArchetype.title,
+        badge: fallbackArchetype.badge,
+        psychologicalProfile: fallbackArchetype.summary,
+        behavioralStrength: "Long-term milestone discipline",
+        riskMitigationRule: "Utilize Step-Down SIPs to avoid breaking compounding momentum during drawdowns.",
+        riskBarrierScore: calculatedRiskBarrier,
+      });
+    } finally {
+      setIsClassifying(false);
+    }
+  };
+
+  const handleGoToSummary = () => {
+    setStep("SUMMARY");
+    fetchAiArchetype();
+  };
 
   const handleUpdateGoal = (index: number, field: keyof LifeGoal, value: any) => {
     const updated = [...userGoals];
@@ -89,19 +144,18 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const handleSaveAndComplete = () => {
-    // Map to profile while preserving archetype string compatibility
-    let legacyArchetype: BehavioralProfile["archetype"] = "Anxious Aarav";
-    if (calculatedRiskBarrier >= 0.75) {
-      legacyArchetype = "Contrarian Accumulator";
-    } else if (calculatedRiskBarrier >= 0.55) {
-      legacyArchetype = "Disciplined Compounder";
-    }
+    const effectiveBarrier = aiClassification?.riskBarrierScore || calculatedRiskBarrier;
+    const effectiveArchetype = aiClassification?.archetypeTitle || fallbackArchetype.title;
 
     const updatedProfile: BehavioralProfile = {
       ...profile,
-      riskBarrier: calculatedRiskBarrier,
-      archetype: archetypeInfo.title as any,
+      name: profile.name || "Rouneet Raj Sinha",
+      riskBarrier: effectiveBarrier,
+      archetype: effectiveArchetype,
       answers,
+      aiProfileSummary: aiClassification?.psychologicalProfile,
+      aiBehavioralStrength: aiClassification?.behavioralStrength,
+      aiRiskMitigationRule: aiClassification?.riskMitigationRule,
     };
 
     onSaveProfile(updatedProfile, userGoals);
@@ -109,7 +163,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
       <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl border border-[#282e3e] bg-[#12151d] p-6 sm:p-8 shadow-2xl text-slate-100">
         {/* Step Indicator Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#242938] pb-4">
@@ -118,13 +172,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <Compass className="h-5 w-5" />
             </div>
             <div>
-              <span className="rounded bg-[#71649C]/20 border border-[#71649C]/40 px-2 py-0.5 text-[10px] font-bold text-purple-300 uppercase tracking-wide">
+              <span className="rounded-full bg-[#71649C]/20 border border-[#71649C]/40 px-2.5 py-0.5 text-[10px] font-bold text-purple-200 uppercase tracking-wide">
                 Personalized Wealth Setup
               </span>
               <h2 className="mt-0.5 text-lg font-bold text-slate-100">
                 {step === "GOALS" && "Step 1: Your Life Milestones"}
                 {step === "QUESTIONNAIRE" && "Step 2: Understanding Your Investment Style"}
-                {step === "SUMMARY" && "Step 3: Your Personalized Plan"}
+                {step === "SUMMARY" && "Step 3: Smart AI Behavioral Profile"}
               </h2>
             </div>
           </div>
@@ -152,14 +206,14 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               2. Style
             </button>
             <button
-              onClick={() => setStep("SUMMARY")}
+              onClick={handleGoToSummary}
               className={`px-3 py-1 rounded-lg font-medium transition ${
                 step === "SUMMARY"
                   ? "bg-[#71649C] text-white shadow-sm font-semibold"
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              3. Profile
+              3. AI Profile
             </button>
           </div>
         </div>
@@ -172,7 +226,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <div>
                 <strong className="text-slate-100 text-sm block">What are you investing for?</strong>
                 <p className="text-slate-400 mt-0.5 leading-relaxed">
-                  Anchor your monthly SIPs to real-life dreams (like a new home, education, or financial freedom). Whenever markets get rocky, our AI co-pilot shows how your timeline is affected instead of confusing you with abstract financial jargon.
+                  Anchor your monthly SIPs to real-life milestones (like your 2032 Dream Home or 2038 Education). Our AI co-pilot calculates concrete timeline impacts rather than confusing percentage drops.
                 </p>
               </div>
             </div>
@@ -279,7 +333,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <div>
                 <strong className="text-slate-100 text-sm block">Understanding Your Investment Style</strong>
                 <p className="text-slate-400 mt-0.5 leading-relaxed">
-                  These quick questions help us tailor calming, smart nudges during market volatility so you never feel overwhelmed or pressured into emotional decisions.
+                  These scenario questions are analyzed by Google Gemini to dynamically calibrate your personalized investor persona and compounding guardrails.
                 </p>
               </div>
             </div>
@@ -341,88 +395,130 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 <span>Back to Milestones</span>
               </button>
               <button
-                onClick={() => setStep("SUMMARY")}
+                onClick={handleGoToSummary}
                 className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-[#71649C] to-[#594d80] px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-[#71649C]/25 hover:brightness-110 active:scale-98 transition"
               >
-                <span>View Your Profile</span>
+                <span>Classify With Gemini AI</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 3: FRIENDLY ARCHETYPE SUMMARY */}
+        {/* STEP 3: DYNAMIC GEMINI AI ARCHETYPE SUMMARY */}
         {step === "SUMMARY" && (
           <div className="mt-6 space-y-5">
-            {/* Friendly Archetype Card */}
-            <div className="rounded-3xl border border-[#71649C]/40 bg-gradient-to-b from-[#71649C]/20 via-[#161a24] to-[#12151d] p-6 text-center space-y-3 shadow-xl">
-              <span className="inline-block rounded-full bg-[#71649C]/30 border border-[#71649C]/60 px-3 py-1 text-[11px] font-bold text-purple-200 uppercase tracking-wider">
-                {archetypeInfo.badge}
-              </span>
-
-              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                Your Profile: <span className="text-calm-amber-300">{archetypeInfo.title}</span>
-              </h3>
-
-              <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-                {archetypeInfo.summary}
-              </p>
-
-              <div className="inline-flex items-center space-x-2 rounded-xl bg-[#0c0e12]/80 border border-[#282e3e] px-3.5 py-1.5 text-xs text-slate-400 font-medium">
-                <Sparkles className="h-4 w-4 text-calm-amber-400" />
-                <span>{archetypeInfo.tagline}</span>
-              </div>
-            </div>
-
-            {/* Anchored Milestones Overview */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
-              <div className="rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 space-y-2">
-                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">
-                  Your Anchored Milestones:
-                </span>
-                <ul className="space-y-2 pt-1">
-                  {userGoals.map((g) => (
-                    <li key={g.id} className="flex items-center justify-between text-slate-200">
-                      <span className="font-medium">• {g.title}</span>
-                      <span className="font-mono text-calm-amber-400 font-semibold">
-                        {g.targetYear} (₹{(g.targetAmount / 100000).toFixed(1)}L)
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 space-y-2">
-                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">
-                  Privacy & Guardrails:
-                </span>
-                <div className="flex items-center space-x-2 text-calm-green-400 font-medium text-xs pt-1">
-                  <CheckCircle2 className="h-4 w-4 shrink-0" />
-                  <span>Zero-PII Anonymized Session</span>
+            {isClassifying ? (
+              <div className="py-12 flex flex-col items-center justify-center space-y-4 text-center rounded-3xl border border-[#71649C]/40 bg-[#161a24] p-8">
+                <div className="relative">
+                  <div className="h-12 w-12 rounded-full border-4 border-[#71649C]/30 border-t-[#71649C] animate-spin" />
+                  <Sparkles className="h-5 w-5 text-calm-amber-400 absolute inset-0 m-auto animate-pulse" />
                 </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  No bank credentials or PAN numbers are ever stored. Your data stays 100% private.
-                </p>
+                <div>
+                  <h3 className="text-base font-bold text-slate-100">
+                    Gemini 1.5 Flash analyzing your psychological risk profile...
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Calibrating behavioral resilience barrier and personalized archetype for {profile.name || "Rouneet Raj Sinha"}.
+                  </p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Dynamically Generated Archetype Card */}
+                <div className="rounded-3xl border border-[#71649C]/50 bg-gradient-to-b from-[#71649C]/20 via-[#161a24] to-[#12151d] p-6 text-center space-y-3.5 shadow-2xl relative overflow-hidden">
+                  <div className="flex items-center justify-center space-x-2">
+                    <span className="inline-block rounded-full bg-[#71649C]/30 border border-[#71649C]/60 px-3 py-1 text-[11px] font-bold text-purple-200 uppercase tracking-wider">
+                      {aiClassification?.badge || fallbackArchetype.badge}
+                    </span>
+                    <span className="rounded-full bg-[#1e2433] border border-[#282e3e] px-2 py-0.5 text-[10px] font-mono text-slate-400">
+                      Gemini 1.5 Flash
+                    </span>
+                  </div>
 
-            {/* Finish and Enter Dashboard CTA */}
-            <div className="flex items-center justify-between pt-4 border-t border-[#242938]">
-              <button
-                onClick={() => setStep("QUESTIONNAIRE")}
-                className="flex items-center space-x-1.5 rounded-xl border border-[#282e3e] px-4 py-2.5 text-xs text-slate-400 hover:text-slate-200 transition"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span>Adjust Answers</span>
-              </button>
-              <button
-                onClick={handleSaveAndComplete}
-                className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-calm-green-600 to-emerald-600 px-7 py-3 text-xs font-bold text-white shadow-xl shadow-green-900/30 hover:brightness-110 active:scale-98 transition"
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                <span>Save Profile & Enter Dashboard</span>
-              </button>
-            </div>
+                  <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                    Your Profile:{" "}
+                    <span className="bg-gradient-to-r from-calm-amber-300 to-amber-200 bg-clip-text text-transparent">
+                      {aiClassification?.archetypeTitle || fallbackArchetype.title}
+                    </span>
+                  </h3>
+
+                  <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+                    {aiClassification?.psychologicalProfile || fallbackArchetype.summary}
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-left text-xs max-w-xl mx-auto">
+                    <div className="rounded-xl bg-[#0c0e12]/80 border border-[#282e3e] p-3 space-y-0.5">
+                      <span className="text-[10px] uppercase font-bold text-calm-green-400 block">
+                        ✨ Core Strength
+                      </span>
+                      <p className="text-slate-200 font-medium">
+                        {aiClassification?.behavioralStrength || "Milestone-anchored discipline"}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-[#0c0e12]/80 border border-[#282e3e] p-3 space-y-0.5">
+                      <span className="text-[10px] uppercase font-bold text-calm-amber-400 block">
+                        🛡️ Co-Pilot Guardrail
+                      </span>
+                      <p className="text-slate-200 font-medium">
+                        {aiClassification?.riskMitigationRule || "Automated Step-Down protection during drawdowns"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Anchored Milestones & Privacy */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+                  <div className="rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 space-y-2">
+                    <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">
+                      Anchored Milestones:
+                    </span>
+                    <ul className="space-y-2 pt-1">
+                      {userGoals.map((g) => (
+                        <li key={g.id} className="flex items-center justify-between text-slate-200">
+                          <span className="font-medium">• {g.title}</span>
+                          <span className="font-mono text-calm-amber-400 font-semibold">
+                            {g.targetYear} (₹{(g.targetAmount / 100000).toFixed(1)}L)
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 space-y-2">
+                    <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">
+                      Privacy & Zero-PII Guarantee:
+                    </span>
+                    <div className="flex items-center space-x-2 text-calm-green-400 font-medium text-xs pt-1">
+                      <CheckCircle2 className="h-4 w-4 shrink-0" />
+                      <span>Zero-PII Anonymized Session</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      No PAN numbers or bank login credentials are ever ingested. Data stays 100% private and protected under SEBI tech guidelines.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Finish CTA */}
+                <div className="flex items-center justify-between pt-4 border-t border-[#242938]">
+                  <button
+                    onClick={() => setStep("QUESTIONNAIRE")}
+                    className="flex items-center space-x-1.5 rounded-xl border border-[#282e3e] px-4 py-2.5 text-xs text-slate-400 hover:text-slate-200 transition"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    <span>Adjust Answers</span>
+                  </button>
+                  <button
+                    onClick={handleSaveAndComplete}
+                    className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-calm-green-600 to-emerald-600 px-7 py-3 text-xs font-bold text-white shadow-xl shadow-green-900/30 hover:brightness-110 active:scale-98 transition"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>Save Profile & Enter Dashboard</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

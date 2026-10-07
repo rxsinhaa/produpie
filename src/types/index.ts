@@ -11,11 +11,14 @@ export interface LifeGoal {
 
 export interface BehavioralProfile {
   name: string;
-  archetype: "Anxious Aarav" | "Disciplined Compounder" | "Contrarian Accumulator";
+  archetype: string;
   monthlyDisposableIncome: number;
   riskBarrier: number; // continuous scale from 0.0 to 1.0 (e.g., 0.60)
   answers: Record<string, number>;
   sessionToken: string; // Cryptographic anonymized Zero-PII token
+  aiProfileSummary?: string;
+  aiBehavioralStrength?: string;
+  aiRiskMitigationRule?: string;
 }
 
 export interface SipHolding {

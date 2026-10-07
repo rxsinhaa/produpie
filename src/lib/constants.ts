@@ -153,8 +153,8 @@ export const DEFAULT_PORTFOLIO_HEALTH: PortfolioHealth = {
 };
 
 export const DEFAULT_PROFILE: BehavioralProfile = {
-  name: "Aarav Sharma",
-  archetype: "Anxious Aarav",
+  name: "Rouneet Raj Sinha",
+  archetype: "Long-Term Steady",
   monthlyDisposableIncome: 85000,
   riskBarrier: 0.6, // Default baseline 0.60
   answers: {

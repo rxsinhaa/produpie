@@ -24,9 +24,9 @@ interface AuthScreenProps {
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
   const { login, signup, loginAsDemo } = useApp();
   const [mode, setMode] = useState<"SIGNIN" | "SIGNUP">("SIGNIN");
-  const [email, setEmail] = useState("aarav.sharma@example.com");
+  const [email, setEmail] = useState("rouneet.sinha@example.com");
   const [password, setPassword] = useState("••••••••••••");
-  const [name, setName] = useState("Aarav Sharma");
+  const [name, setName] = useState("Rouneet Raj Sinha");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,7 +35,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
     setIsLoading(true);
     setTimeout(() => {
       if (mode === "SIGNIN") {
-        login(email, name || "Aarav Sharma");
+        login(email, name || "Rouneet Raj Sinha");
       } else {
         signup(email, name || "Investor");
       }
@@ -129,14 +129,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
               <div className="space-y-0.5">
                 <div className="flex items-center space-x-2">
                   <span className="font-bold text-slate-100 text-xs sm:text-sm">
-                    Interactive Reviewer Demo
+                    Interactive Pro Investor Demo
                   </span>
-                  <span className="rounded bg-calm-amber-500/20 border border-calm-amber-500/40 px-1.5 py-0.2 text-[9px] font-bold text-calm-amber-300 uppercase">
+                  <span className="rounded-full bg-calm-amber-500/20 border border-calm-amber-500/40 px-2 py-0.2 text-[9px] font-bold text-calm-amber-300 uppercase">
                     Instant Access
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-400">
-                  Pre-loaded with Aarav's ₹22.1L portfolio and simulated -7.5% market dip.
+                  Pre-loaded with Rouneet's ₹22.1L portfolio and simulated -7.5% market dip.
                 </p>
               </div>
 
@@ -267,7 +267,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Aarav Sharma"
+                    placeholder="e.g. Rouneet Raj Sinha"
                     className="w-full rounded-xl border border-[#282e3e] bg-[#0c0e12] px-3.5 py-2.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-[#71649C] focus:ring-1 focus:ring-[#71649C] transition font-medium"
                   />
                 </div>

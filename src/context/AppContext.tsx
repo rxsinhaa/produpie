@@ -46,13 +46,16 @@ interface AppContextType {
   portfolio: PortfolioHealth;
   setPortfolio: React.Dispatch<React.SetStateAction<PortfolioHealth>>;
 
-  // Simulation & Dev Telemetry
+  // Simulation & Pro Telemetry
   isMarketCrashActive: boolean;
   toggleMarketCrash: () => void;
   isCutoffSimulated: boolean;
   toggleCutoffSimulation: () => void;
   failOpenMode: boolean;
   toggleFailOpen: () => void;
+  isProModeOpen: boolean;
+  toggleProMode: () => void;
+  // Legacy aliases
   isDevModeOpen: boolean;
   toggleDevMode: () => void;
   resetDemo: () => void;
@@ -72,6 +75,10 @@ interface AppContextType {
     type: "STEP_DOWN" | "SKIP_SINGLE" | "CONTINUE_SIP" | "PAUSE_ANYWAY" | "HARVEST_TLH",
     details?: { stepDownAmount?: number; months?: number }
   ) => void;
+
+  // AI Health Report Modal
+  isHealthReportModalOpen: boolean;
+  setIsHealthReportModalOpen: (open: boolean) => void;
 
   // Toasts & Drawers
   failOpenToast: { show: boolean; reason: string };
@@ -96,7 +103,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Auth state - default to false so landing page is Login screen as requested
+  // Auth state - default to false so landing page is Login screen
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<UserSession | null>(null);
 
@@ -107,15 +114,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [holdings, setHoldings] = useState<SipHolding[]>(DEFAULT_SIP_HOLDINGS);
   const [portfolio, setPortfolio] = useState<PortfolioHealth>(DEFAULT_PORTFOLIO_HEALTH);
 
-  // Dev & Simulation Toggles
+  // Pro Telemetry & Simulation Toggles
   const [isMarketCrashActive, setIsMarketCrashActive] = useState<boolean>(true);
   const [isCutoffSimulated, setIsCutoffSimulated] = useState<boolean>(false);
   const [failOpenMode, setFailOpenMode] = useState<boolean>(false);
-  const [isDevModeOpen, setIsDevModeOpen] = useState<boolean>(false);
+  const [isProModeOpen, setIsProModeOpen] = useState<boolean>(false);
 
   // Modals & Interceptions
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
   const [isInterceptModalOpen, setIsInterceptModalOpen] = useState<boolean>(false);
+  const [isHealthReportModalOpen, setIsHealthReportModalOpen] = useState<boolean>(false);
   const [selectedHolding, setSelectedHolding] = useState<SipHolding | null>(null);
   const [riskScoreResult, setRiskScoreResult] = useState<RiskScoreResult | null>(null);
   const [isEvaluatingRisk, setIsEvaluatingRisk] = useState<boolean>(false);
@@ -140,7 +148,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     algoId: "",
   });
 
-  // Check Local Storage on mount for saved auth session if any
+  // Check Local Storage on mount for saved auth session
   useEffect(() => {
     try {
       const savedAuth = localStorage.getItem("finlit_user_auth");
@@ -154,9 +162,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
-  const login = (email = "aarav.sharma@example.com", name = "Aarav Sharma") => {
+  const login = (email = "rouneet.sinha@example.com", name = "Rouneet Raj Sinha") => {
     const session: UserSession = {
-      id: "usr_aarav_2026",
+      id: "usr_rouneet_2026",
       name,
       email,
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
@@ -171,12 +179,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const signup = (email: string, name: string) => {
     login(email, name);
-    // Trigger onboarding for new signups
     setIsOnboardingOpen(true);
   };
 
   const loginAsDemo = () => {
-    login("aarav.sharma@example.com", "Aarav Sharma");
+    login("rouneet.sinha@example.com", "Rouneet Raj Sinha");
   };
 
   const logout = () => {
@@ -213,8 +220,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setFailOpenMode((prev) => !prev);
   };
 
-  const toggleDevMode = () => {
-    setIsDevModeOpen((prev) => !prev);
+  const toggleProMode = () => {
+    setIsProModeOpen((prev) => !prev);
   };
 
   const resetDemo = () => {
@@ -227,6 +234,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsCutoffSimulated(false);
     setFailOpenMode(false);
     setIsInterceptModalOpen(false);
+    setIsHealthReportModalOpen(false);
     setConfirmationState({ isOpen: false, actionType: null, fundName: "", algoId: "" });
   };
 
@@ -265,7 +273,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         clearTimeout(timeoutId);
         triggerFailOpen(
           holding,
-          "Latency SLA > 200ms. In accordance with SEBI resilience protocols, order defaulted to standard routing."
+          "Execution SLA timeout > 200ms. In accordance with SEBI resilience protocols, direct order routed."
         );
         setIsEvaluatingRisk(false);
         return;
@@ -278,7 +286,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (errorData.failOpen) {
           triggerFailOpen(
             holding,
-            `Edge inference timeout (${errorData.latencyMs}ms). Fail-Open routing executed without modal intervention.`
+            `Edge inference timeout (${errorData.latencyMs}ms). Direct fail-open routing executed.`
           );
           setIsEvaluatingRisk(false);
           return;
@@ -407,13 +415,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleCutoffSimulation,
         failOpenMode,
         toggleFailOpen,
-        isDevModeOpen,
-        toggleDevMode,
+        isProModeOpen,
+        toggleProMode,
+        isDevModeOpen: isProModeOpen,
+        toggleDevMode: toggleProMode,
         resetDemo,
         isOnboardingOpen,
         setIsOnboardingOpen,
         isInterceptModalOpen,
         setIsInterceptModalOpen,
+        isHealthReportModalOpen,
+        setIsHealthReportModalOpen,
         selectedHolding,
         setSelectedHolding,
         riskScoreResult,
