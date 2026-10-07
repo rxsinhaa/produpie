@@ -115,10 +115,10 @@ export const AmbientDashboard: React.FC = () => {
               <button
                 onClick={() => setIsHealthReportModalOpen(true)}
                 className="flex items-center space-x-1.5 rounded-xl bg-gradient-to-r from-[#71649C] to-calm-navy-700 px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-[#71649C]/25 hover:brightness-110 active:scale-95 transition"
-                title="Generate comprehensive AI Portfolio Health & Risk Audit Report with Gemini 1.5 Pro"
+                title="Generate comprehensive The LIT Buddy Portfolio Health & Risk Audit Report with Gemini 1.5 Pro"
               >
                 <Sparkles className="h-3.5 w-3.5 text-calm-amber-300" />
-                <span>AI Health Report</span>
+                <span>The LIT Buddy Report</span>
               </button>
             </div>
           </div>
@@ -193,7 +193,7 @@ export const AmbientDashboard: React.FC = () => {
           </div>
 
           <div className="mt-4 pt-2 border-t border-[#242938] flex items-center justify-between text-[11px]">
-            <span className="text-slate-400">AI Guardrail:</span>
+            <span className="text-slate-400">The LIT Buddy:</span>
             <span className="font-semibold text-calm-green-400 flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" /> Auto-Protect Active
             </span>
@@ -211,7 +211,7 @@ export const AmbientDashboard: React.FC = () => {
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-bold text-slate-100 text-sm sm:text-base">
-                  Quantitative Co-Pilot Contrarian Insight
+                  The LIT Buddy Contrarian Insight
                 </span>
                 <span className="rounded-full bg-calm-amber-500/20 border border-calm-amber-500/40 px-2 py-0.5 text-[10px] font-bold text-calm-amber-300 uppercase">
                   Units on 12.6% Discount

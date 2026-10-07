@@ -77,7 +77,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
           <div className="inline-flex items-center space-x-2 rounded-full border border-[#71649C]/40 bg-[#71649C]/10 px-3 py-1.5 backdrop-blur-md">
             <ShieldCheck className="h-4 w-4 text-calm-amber-400" />
             <span className="text-xs font-semibold tracking-wide text-slate-200">
-              FinLit Behavioral Wealth Co-Pilot
+              The LIT Buddy • AI Behavioral Wealth Guardrail
             </span>
           </div>
 
@@ -89,7 +89,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
               </span>
             </h1>
             <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-lg">
-              Your AI co-pilot designed to neutralize retail anxiety, prevent costly SIP leaks, and turn market corrections into powerful wealth-compounding opportunities.
+              The LIT Buddy is your behavioral wealth co-pilot designed to neutralize retail anxiety, prevent costly SIP leaks, and turn market corrections into powerful wealth-compounding opportunities.
             </p>
           </div>
 

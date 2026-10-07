@@ -178,7 +178,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <h2 className="mt-0.5 text-lg font-bold text-slate-100">
                 {step === "GOALS" && "Step 1: Your Life Milestones"}
                 {step === "QUESTIONNAIRE" && "Step 2: Understanding Your Investment Style"}
-                {step === "SUMMARY" && "Step 3: Smart AI Behavioral Profile"}
+                {step === "SUMMARY" && "Step 3: The LIT Buddy Profile"}
               </h2>
             </div>
           </div>
@@ -213,7 +213,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              3. AI Profile
+              3. The LIT Buddy
             </button>
           </div>
         </div>
@@ -226,7 +226,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <div>
                 <strong className="text-slate-100 text-sm block">What are you investing for?</strong>
                 <p className="text-slate-400 mt-0.5 leading-relaxed">
-                  Anchor your monthly SIPs to real-life milestones (like your 2032 Dream Home or 2038 Education). Our AI co-pilot calculates concrete timeline impacts rather than confusing percentage drops.
+                  Anchor your monthly SIPs to real-life milestones (like your 2032 Dream Home or 2038 Education). The LIT Buddy calculates concrete timeline impacts rather than confusing percentage drops.
                 </p>
               </div>
             </div>
@@ -333,7 +333,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <div>
                 <strong className="text-slate-100 text-sm block">Understanding Your Investment Style</strong>
                 <p className="text-slate-400 mt-0.5 leading-relaxed">
-                  These scenario questions are analyzed by Google Gemini to dynamically calibrate your personalized investor persona and compounding guardrails.
+                  These scenario questions are analyzed by The LIT Buddy to dynamically calibrate your personalized investor persona and compounding guardrails.
                 </p>
               </div>
             </div>
@@ -398,7 +398,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 onClick={handleGoToSummary}
                 className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-[#71649C] to-[#594d80] px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-[#71649C]/25 hover:brightness-110 active:scale-98 transition"
               >
-                <span>Classify With Gemini AI</span>
+                <span>Classify With The LIT Buddy</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -416,7 +416,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-100">
-                    Gemini 1.5 Flash analyzing your psychological risk profile...
+                    The LIT Buddy is analyzing your psychological risk profile...
                   </h3>
                   <p className="text-xs text-slate-400 mt-1">
                     Calibrating behavioral resilience barrier and personalized archetype for {profile.name || "Rouneet Raj Sinha"}.
@@ -432,7 +432,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       {aiClassification?.badge || fallbackArchetype.badge}
                     </span>
                     <span className="rounded-full bg-[#1e2433] border border-[#282e3e] px-2 py-0.5 text-[10px] font-mono text-slate-400">
-                      Gemini 1.5 Flash
+                      The LIT Buddy
                     </span>
                   </div>
 
@@ -459,7 +459,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
                     <div className="rounded-xl bg-[#0c0e12]/80 border border-[#282e3e] p-3 space-y-0.5">
                       <span className="text-[10px] uppercase font-bold text-calm-amber-400 block">
-                        🛡️ Co-Pilot Guardrail
+                        🛡️ The LIT Buddy Guardrail
                       </span>
                       <p className="text-slate-200 font-medium">
                         {aiClassification?.riskMitigationRule || "Automated Step-Down protection during drawdowns"}

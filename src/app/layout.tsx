@@ -3,9 +3,9 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "FinLit | AI Behavioral Wealth Co-Pilot & Compounding Guardrail",
+  title: "FinLit | The LIT Buddy - AI Behavioral Wealth Co-Pilot & Compounding Guardrail",
   description:
-    "Empathetic, consumer-first behavioral finance engine preventing retail SIP panic during market drawdowns with deterministic actuarial math, TradingView time-series charts, and SEBI-compliant guardrails.",
+    "Empathetic, consumer-first behavioral finance engine featuring The LIT Buddy to prevent retail SIP panic during market drawdowns with deterministic actuarial math, TradingView time-series charts, and SEBI-compliant guardrails.",
   keywords: [
     "FinLit",
     "SIP Leak",

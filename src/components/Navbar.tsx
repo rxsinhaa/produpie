@@ -47,14 +47,14 @@ export const Navbar: React.FC = () => {
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-lg font-extrabold tracking-tight text-slate-100">
-                  FinLit <span className="text-calm-amber-400">Co-Pilot</span>
+                  FinLit <span className="text-calm-amber-400">The LIT Buddy</span>
                 </span>
                 <span className="hidden sm:inline-block rounded-full bg-[#71649C]/20 border border-[#71649C]/40 px-2 py-0.5 text-[10px] font-bold text-purple-200">
                   PRO WEALTH
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden xs:block">
-                AI Wealth Guardrails & Behavioral Protection
+                The LIT Buddy • AI Behavioral Wealth Guardrail
               </p>
             </div>
           </div>

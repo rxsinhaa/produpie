@@ -255,7 +255,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
                 <Sparkles className="h-3.5 w-3.5" />
               </div>
               <span className="text-xs font-bold text-purple-200 uppercase tracking-wider">
-                Pre-Pause AI Consequence Analysis
+                The LIT Buddy: Pre-Pause Consequence Analysis
               </span>
               <span className="rounded-full bg-[#71649C]/30 border border-[#71649C]/60 px-2 py-0.2 text-[9px] font-mono font-bold text-purple-300 uppercase">
                 {aiModelUsed}
@@ -266,7 +266,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
               onClick={fetchAiPrePauseReport}
               disabled={isAiLoading}
               className="text-[11px] text-purple-300 hover:text-white flex items-center gap-1 transition"
-              title="Refresh AI analysis"
+              title="Refresh The LIT Buddy analysis"
             >
               <RefreshCw className={`h-3 w-3 ${isAiLoading ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">Refresh</span>
@@ -277,7 +277,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
             <div className="py-4 space-y-2 text-xs">
               <div className="flex items-center space-x-2 text-purple-300 font-medium">
                 <div className="h-3.5 w-3.5 rounded-full border-2 border-purple-400 border-t-transparent animate-spin" />
-                <span>Gemini 1.5 Flash analyzing actuarial compounding impact on your {goal.title}...</span>
+                <span>The LIT Buddy is analyzing actuarial compounding impact on your {goal.title}...</span>
               </div>
               <div className="space-y-1.5 pt-1">
                 <div className="h-3.5 bg-[#202638] rounded-full animate-pulse w-full" />

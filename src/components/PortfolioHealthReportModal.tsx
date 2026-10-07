@@ -94,14 +94,14 @@ export const PortfolioHealthReportModal: React.FC<PortfolioHealthReportModalProp
             <div>
               <div className="flex items-center space-x-2">
                 <span className="rounded-full bg-[#71649C]/20 border border-[#71649C]/40 px-2.5 py-0.5 text-[10px] font-bold text-purple-200 uppercase">
-                  Powered by Google Gemini
+                  Powered by Google Gemini • The LIT Buddy
                 </span>
                 <span className="rounded-full bg-[#1e2433] border border-[#282e3e] px-2 py-0.5 text-[10px] font-mono text-slate-400">
                   {modelUsed}
                 </span>
               </div>
               <h2 className="mt-1 text-lg sm:text-xl font-bold text-slate-100">
-                AI Portfolio Health & Risk Intelligence Audit
+                The LIT Buddy: Portfolio Health & Risk Intelligence Audit
               </h2>
             </div>
           </div>
@@ -124,7 +124,7 @@ export const PortfolioHealthReportModal: React.FC<PortfolioHealthReportModalProp
               </div>
               <div>
                 <h3 className="text-base font-bold text-slate-100">
-                  AI is analyzing your portfolio & milestone trajectory...
+                  The LIT Buddy is analyzing your portfolio & milestone trajectory...
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
                   Synthesizing actuarial math, asset allocation drift, and milestone horizons with Gemini.
@@ -257,7 +257,7 @@ export const PortfolioHealthReportModal: React.FC<PortfolioHealthReportModalProp
             className="flex items-center space-x-1.5 rounded-xl border border-[#282e3e] bg-[#14171f] px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:border-slate-500 transition"
           >
             {copied ? <Check className="h-3.5 w-3.5 text-calm-green-400" /> : <Copy className="h-3.5 w-3.5" />}
-            <span>{copied ? "Copied to Clipboard" : "Copy Audit Report"}</span>
+            <span>{copied ? "Copied to Clipboard" : "Copy The LIT Buddy Audit"}</span>
           </button>
 
           <button

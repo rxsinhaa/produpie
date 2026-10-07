@@ -55,7 +55,7 @@ export class GeminiFinancialAIService {
   ): Promise<{ report: string; modelUsed: string; isAiGenerated: boolean }> {
     const formatInr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
     const prompt = `
-System Role: You are an elite, certified behavioral finance advisor and AI co-pilot.
+System Role: You are The LIT Buddy — an elite, certified behavioral finance advisor and AI co-pilot for retail investors.
 Compliance Mandate: Under SEBI guidelines, NEVER hallucinate numbers, make speculative price predictions, or give individual fund endorsements. Strictly explain the provided deterministic actuarial math.
 
 User Context:
@@ -70,7 +70,7 @@ User Context:
   * Current Market Pullback: ${params.currentDrawdownPct}% (India VIX: ${params.vix}).
 
 Task:
-Write a crisp, high-impact, 3-bullet point "AI Consequence Report" explaining why pausing now damages their milestone and destroys the Rupee Cost Averaging advantage.
+Write a crisp, high-impact, 3-bullet point "The LIT Buddy Consequence Report" explaining why pausing now damages their milestone and destroys the Rupee Cost Averaging advantage.
 Structure requirements:
 - Point 1: Explain the Rupee Cost Averaging penalty (units on sale at +${params.rcaUnitDiscountPct}% discount).
 - Point 2: Explain the concrete milestone delay (~${params.projectedMilestoneDelayMonths} months delay on their ${params.goalTitle}).
@@ -94,9 +94,9 @@ Structure requirements:
     // High-fidelity fallback generated directly from deterministic math
     const fallbackReport = `• **Rupee Cost Averaging Penalty:** Halting your ${formatInr(params.monthlyAmount)} contribution forfeits acquiring fund units at a **+${params.rcaUnitDiscountPct}% unit discount** (NAV ₹${params.currentNav.toFixed(2)} vs 6-month avg ₹${params.avgNav.toFixed(2)}).
 • **Milestone Timeline Fracture:** Pausing for ${params.pauseMonths} months creates a **-${formatInr(params.calculatedDeficit)} compounded deficit**, directly delaying your **${params.goalTitle} (${params.goalYear}) by ~${params.projectedMilestoneDelayMonths} months**.
-• **Pro Wealth Recommendation:** Instead of an outright pause, activate the **Step-Down SIP (₹${Math.round(params.monthlyAmount * 0.5).toLocaleString("en-IN")}/mo)** to alleviate cashflow while preserving over 70% of your compounding trajectory.`;
+• **The LIT Buddy Recommendation:** Instead of an outright pause, activate the **Step-Down SIP (₹${Math.round(params.monthlyAmount * 0.5).toLocaleString("en-IN")}/mo)** to alleviate cashflow while preserving over 70% of your compounding trajectory.`;
 
-    return { report: fallbackReport, modelUsed: "deterministic-math-engine", isAiGenerated: false };
+    return { report: fallbackReport, modelUsed: "The LIT Buddy Engine", isAiGenerated: false };
   }
 
   /**
@@ -127,7 +127,7 @@ Structure requirements:
       .join("\n");
 
     const prompt = `
-System Role: You are the Chief Quantitative Strategist for FinLit Co-Pilot.
+System Role: You are The LIT Buddy — Chief Quantitative Strategist and AI Wealth Co-Pilot.
 Compliance Mandate: Adhere strictly to SEBI technology advisory guidelines. NEVER hallucinate metrics or recommend individual stock tips. Evaluate solely the provided deterministic portfolio state.
 
 Investor Profile:
@@ -146,7 +146,7 @@ Active Systematic Investment Mandates:
 ${holdingsSummary}
 
 Task:
-Generate a comprehensive, beautifully structured **AI Portfolio Health & Risk Audit Report** in Markdown format.
+Generate a comprehensive, beautifully structured **The LIT Buddy Portfolio Health & Risk Audit Report** in Markdown format.
 Include these exact sections:
 1. ### 🔍 Executive Risk Classification & Health Diagnostic
    - Classify overall risk level (e.g., "Optimal Compounding Velocity / Moderate Volatility Exposure").
@@ -157,7 +157,7 @@ Include these exact sections:
 3. ### ⚖️ Asset Allocation & Contrarian Drift Analysis
    - Analyze the 68% equity vs 70% target drift during market drawdowns.
    - Highlight the Rupee Cost Averaging advantage of buying discounted units in mid-caps today.
-4. ### 🛡️ Pro Co-Pilot Action Protocol
+4. ### 🛡️ The LIT Buddy Action Protocol
    - 3 actionable, compliant wealth principles (e.g. automated step-down safety valve, maintaining liquid emergency buffer, utilizing tax-loss harvesting if rebalancing).
 
 Tone: Sophisticated, quantitative, empathetic, and encouraging. Use bold key metrics.
@@ -199,12 +199,12 @@ Tone: Sophisticated, quantitative, empathetic, and encouraging. Use bold key met
 - **Current Allocation:** Equity **${params.portfolio.assetAllocation.equity}%** | Debt **${params.portfolio.assetAllocation.debt}%** | Gold **${params.portfolio.assetAllocation.gold}%** | Liquid **${params.portfolio.assetAllocation.liquid}%**.
 - **Tactical Buying Window:** The -7.5% market pullback has created a **12.6% discount** in your **Nippon Growth Mid-Cap SIP** NAV (₹88.40 vs 6-mo average ₹101.20). Your fixed monthly debit acquires **+14.5% more fund units** per cycle.
 
-### 🛡️ Pro Co-Pilot Action Protocol
+### 🛡️ The LIT Buddy Action Protocol
 1. **Maintain Equity Accumulation:** Do not halt SIPs during market stress; Rupee Cost Averaging produces maximum alpha during drawdowns.
 2. **Step-Down Flexibility:** If liquidity tightens, utilize the **50% Step-Down option** rather than an outright pause to protect 70%+ of your compounding habit.
 3. **Preserve Liquid Runway:** Keep your ₹5,000/mo liquid fund debit active to protect your emergency buffer without forced equity liquidations.`;
 
-    return { report: fallbackReport, modelUsed: "deterministic-math-engine", isAiGenerated: false };
+    return { report: fallbackReport, modelUsed: "The LIT Buddy Engine", isAiGenerated: false };
   }
 
   /**
@@ -218,7 +218,7 @@ Tone: Sophisticated, quantitative, empathetic, and encouraging. Use bold key met
     const baseBarrier = parseFloat(avgScore.toFixed(2));
 
     const prompt = `
-System Role: You are a behavioral finance AI psychologist and investment persona classifier.
+System Role: You are The LIT Buddy — a behavioral finance AI psychologist and investment persona classifier.
 Task: Analyze the user's responses to 4 behavioral financial scenarios and output a JSON profile.
 
 User Context:
@@ -248,7 +248,7 @@ Output Requirements: Return ONLY a valid raw JSON object with these exact keys:
           const parsed = JSON.parse(jsonMatch[0]);
           return {
             archetypeTitle: parsed.archetypeTitle || (baseBarrier >= 0.75 ? "Dynamic Opportunity Seeker" : baseBarrier >= 0.55 ? "Disciplined Wealth Builder" : "Long-Term Steady"),
-            badge: parsed.badge || "PRO VERIFIED PROFILE",
+            badge: parsed.badge || "THE LIT BUDDY VERIFIED",
             psychologicalProfile: parsed.psychologicalProfile || "You maintain a steady, milestone-anchored compounding posture capable of navigating routine market drawdowns with automated safeguards.",
             behavioralStrength: parsed.behavioralStrength || "Milestone-oriented discipline",
             riskMitigationRule: parsed.riskMitigationRule || "Utilize Step-Down safety valves rather than stopping SIPs during drawdowns.",
@@ -284,10 +284,11 @@ Output Requirements: Return ONLY a valid raw JSON object with these exact keys:
     return {
       archetypeTitle: "Long-Term Steady",
       badge: "STEADY COMPOUNDER",
-      psychologicalProfile: "You value emotional peace of mind and milestone certainty. Your AI co-pilot automatically protects your compounding habit by offering gentle step-down contributions during rough markets.",
+      psychologicalProfile: "You value emotional peace of mind and milestone certainty. The LIT Buddy automatically protects your compounding habit by offering gentle step-down contributions during rough markets.",
       behavioralStrength: "High commitment to milestone preservation",
       riskMitigationRule: "Use automated 50% Step-Down options to avoid disruptive cashflow shocks.",
       riskBarrierScore: baseBarrier,
     };
   }
 }
+

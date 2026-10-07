@@ -179,7 +179,7 @@ export const getFriendlyArchetypeInfo = (barrier: number): FriendlyArchetypeInfo
     return {
       title: "Long-Term Steady",
       badge: "STEADY COMPOUNDER",
-      summary: "You prefer calm consistency and peace of mind. Your AI co-pilot will automatically recommend gentle step-down contributions during rough markets rather than stopping your compounding habit entirely.",
+      summary: "You prefer calm consistency and peace of mind. The LIT Buddy will automatically recommend gentle step-down contributions during rough markets rather than stopping your compounding habit entirely.",
       tagline: "Prioritizes emotional comfort & milestone stability",
       color: "#fbbf24", // calm amber
     };
