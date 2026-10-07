@@ -13,87 +13,139 @@
 
 ## 📌 Executive Summary
 
-**FinLit (The LIT Buddy)** is a next-generation, behavioral-finance-driven wealth intelligence platform designed to eliminate the **"SIP Leak"** phenomenon. In retail wealth compounding, investors systematically pause or cancel systematic investment plans during market corrections due to emotional loss aversion. 
+**FinLit (The LIT Buddy)** is an institutional-grade, behavioral-finance-driven wealth intelligence platform designed to eliminate the **"SIP Leak"** phenomenon. In retail wealth compounding, investors systematically pause or cancel Systematic Investment Plans (SIPs) during market corrections due to emotional loss aversion.
 
-By marrying **Explainable AI (XAI)** powered by **Google Gemini (1.5 Flash & 1.5 Pro)** with a **Deterministic Actuarial Math Engine**, **The LIT Buddy** transforms market panics into disciplined wealth-compounding opportunities without cognitive overload.
+By marrying **Dual-Tier Generative AI (Google Gemini 1.5 Flash & 1.5 Pro)** with a **Deterministic Actuarial Math Engine**, **The LIT Buddy** transforms market anxiety into disciplined compounding alpha while strictly adhering to SEBI technology and advisory guidelines.
 
 ---
 
 ## ⚡ The Core Problem: The "SIP Leak"
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          THE RETAIL SIP TRAP                            │
-├─────────────────────────────────────────────────────────────────────────┤
-│  1. Market Pullback (-7.5% Dip)                                         │
-│  2. Loss Aversion Triggers Anxiety (Prospect Theory)                    │
-│  3. Investor Halts Monthly SIP (Forfeiting Discounted NAV Units)         │
-│  4. Compounding Runway Breaks ➔ -₹99,583+ Deficit at Target Horizon      │
-└─────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            THE RETAIL SIP TRAP                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  1. Market Pullback (-7.5% Dip in Mid/Small Caps)                           │
+│  2. Loss Aversion Triggers Anxiety (Kahneman & Tversky Prospect Theory)      │
+│  3. Investor Halts Monthly SIP (Forfeiting Discounted NAV Units)             │
+│  4. Compounding Runway Breaks ➔ -₹99,583+ Terminal Deficit at Milestone     │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-When retail investors panic-pause their SIPs during drawdowns, they forfeit **Rupee Cost Averaging (RCA)** benefits—buying fewer units precisely when asset valuations are on sale. **The LIT Buddy** provides an empathetic **Cognitive Circuit Breaker** that translates abstract percentage drawdowns into concrete milestone impacts (e.g. *"+14.5% more units per ₹1,000; pausing delays your 2032 Dream Home by ~3 months"*).
+When retail investors panic-pause their SIPs during drawdowns, they forfeit **Rupee Cost Averaging (RCA)** benefits—buying fewer units precisely when fund valuations are discounted. **The LIT Buddy** introduces an empathetic **Cognitive Circuit Breaker** that translates abstract percentage drops into concrete milestone impacts (e.g., *"+14.5% more units per ₹1,000; pausing delays your 2032 Dream Home by ~3 months"*).
 
 ---
 
-## 🌟 Key Features
+## 🧠 Deep AI Architecture: The LIT Buddy Engine
 
-### 1. 🛡️ The Cognitive Circuit Breaker
-- **Calm Behavioral Review**: Intercepts SIP cancellation requests with a calculated 3-second deliberate review period, using calming institutional tones (amber/navy/slate) rather than panic-inducing red badges.
-- **Explainable Milestone Delays**: Replaces confusing percentages with concrete time impacts (e.g., *Pausing for 3 months delays your 2032 House Downpayment by ~3 months*).
-- **SEBI 3:00 PM Cut-off Warning**: Real-time IST detection that alerts investors when a cancellation during the 2:50 PM – 3:00 PM window shifts execution into a T+1 settlement cycle.
+**The LIT Buddy** leverages a dual-tier AI architecture powered by **Google Gemini** in symbiosis with an exact deterministic actuarial math engine.
 
-### 2. 🤖 The LIT Buddy AI Suite (Google Gemini)
-- **Pre-Pause Consequence Analysis (`gemini-1.5-flash`)**: Rapid, empathetic consequence analysis explaining the Rupee Cost Averaging discount penalty and recommending step-down alternatives.
-- **On-Demand Portfolio Health & Risk Audit (`gemini-1.5-pro`)**: Deep quantitative audit analyzing asset allocation drift (e.g., 68% equity vs 70% target), 94% execution regularity, and milestone horizon health.
-- **Smart Archetype Classifier (`gemini-1.5-flash`)**: 4-scenario behavioral questionnaire dynamically evaluated to output customized investor risk profiles and mitigation rules.
-- **Zero-Error Architecture**: Triple-tier fallback (`Gemini 1.5 Pro` ➔ `Gemini 1.5 Flash` ➔ `Deterministic Math Engine`) ensures zero UI blocking, zero unhandled errors, and sub-200ms SLAs.
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                 THE LIT BUDDY DUAL-TIER AI ARCHITECTURE                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+               ┌──────────────────────┴──────────────────────┐
+               ▼                                             ▼
+┌─────────────────────────────┐               ┌─────────────────────────────┐
+│     ⚡ GEMINI 1.5 FLASH      │               │     🔬 GEMINI 1.5 PRO       │
+├─────────────────────────────┤               ├─────────────────────────────┤
+│ • Sub-200ms Execution SLA   │               │ • Deep Reasoning & Audit    │
+│ • Pre-Pause Consequence AI  │               │ • Portfolio Health Engine   │
+│ • Archetype Persona Engine  │               │ • Asset Allocation Drift    │
+│ • High-Speed Intervention   │               │ • Milestone Horizon Audit   │
+└─────────────────────────────┘               └─────────────────────────────┘
+               │                                             │
+               └──────────────────────┬──────────────────────┘
+                                      ▼
+               ┌─────────────────────────────────────────────┐
+               │    🛡️ DETERMINISTIC ACTUARIAL MATH ENGINE    │
+               ├─────────────────────────────────────────────┤
+               │ • Zero-Hallucination Verified Calculations  │
+               │ • Exact Rupee Deficit & Milestone Delays    │
+               │ • SEBI 3PM Cut-Off Clock & T+1 NAV Shift    │
+               │ • Tax-Loss Harvesting (Sec 111A/112A)       │
+               └─────────────────────────────────────────────┘
+```
 
-### 3. ✂️ Compounding Safety Valves
-- **Step-Down SIP (50%)**: Temporarily reduces monthly contributions (e.g., ₹15,000 ➔ ₹7,500/mo) to relieve cashflow stress while preserving over 70% of the compounding trajectory.
-- **Skip Single Month**: Skips only the current debit without cancelling the bank auto-debit mandate.
-- **Tax-Loss Harvesting (TLH) Analyzer**: Tranche-level tax shield calculation displaying short-term capital loss offsets (20% STCG tax shield under Indian IT Act).
+---
 
-### 4. 📈 Institutional Market Visualizer & Pro Telemetry
-- **TradingView Lightweight Charts**: Interactive 180-day time-series NAV simulator rendered in dark mode (`#0c0e12`).
-- **Pro Telemetry Drawer**: Institutional analytics tracking tokenized session IDs, SEBI cut-off clocks, fail-open latency monitors, and stress test simulators.
+### 1. ⚡ High-Speed Pre-Pause Consequence Analysis (`Gemini 1.5 Flash`)
+When an investor attempts to pause or cancel a SIP mandate, **The LIT Buddy** intercepts the request within **<200ms**:
+- **Deterministic Math Context Injection**: The exact mathematical shortfall, NAV discount (+14.5%), and milestone delay (~3 months) are computed deterministically and fed directly into the prompt context.
+- **Empathetic Behavioral Framing**: Gemini formats the output into a crisp 3-bullet consequence report explaining the **Rupee Cost Averaging penalty** and recommending a **50% Step-Down alternative** rather than an outright halt.
+- **Strict Compliance Enforcement**: System prompts forbid Gemini from speculating on market bottoms or providing unverified fund recommendations.
+
+### 2. 🔬 On-Demand Portfolio Health & Risk Intelligence Audit (`Gemini 1.5 Pro`)
+Investors can trigger a comprehensive portfolio health audit across 4 core dimensions:
+- **Executive Risk Classification**: Evaluates current volatility exposure (India VIX 14.8) against a **92/100 Compounding Health Score** and **94% execution regularity**.
+- **Life Milestone Horizon Audit**: Quantifies compounding runway progress for anchored goals (e.g., *2032 House Downpayment: ₹6.40L accumulated towards ₹25.00L target*).
+- **Asset Allocation & Contrarian Drift**: Highlights tactical buying opportunities in mid-caps when equity allocation drifts (68% current vs 70% target).
+- **The LIT Buddy Action Protocol**: Delivers 3 actionable, SEBI-compliant wealth principles (Step-Down safety valves, liquid emergency buffers, and tax harvesting).
+
+### 3. 🎯 Smart Behavioral Persona Classification (`Gemini 1.5 Flash`)
+- Evaluates 4 real-world scenario questions mapping an investor's psychological comfort with volatility.
+- Synthesizes responses into an explainable **Calibrated Risk Barrier ($0.00$ to $1.00$)** and assigns tailored personas:
+  - **Pragmatic Horizon Compounder** (Contrarian dip buyer)
+  - **Disciplined Wealth Builder** (Milestone-anchored consistent investor)
+  - **Steady Milestone Builder** (Peace-of-mind compounder with step-down guardrails)
+
+### 4. 🛡️ Fail-Open Zero-Error Fallback Matrix
+To guarantee **100% uptime with zero runtime errors**, every API route employs a graceful triple-tier failover mechanism:
+1. **Tier 1**: Google Gemini 1.5 Pro / Flash Inference
+2. **Tier 2**: Cross-Model Fallback (`Gemini 1.5 Pro` $\rightarrow$ `Gemini 1.5 Flash`)
+3. **Tier 3**: Instant Deterministic Actuarial Math Synthesis (Zero UI blocking; sub-200ms SLA)
+
+---
+
+## 🌟 Comprehensive Feature Suite
+
+| Feature | Description | Behavioral Impact |
+|---|---|---|
+| **Cognitive Circuit Breaker** | Calm 3-second deliberate review countdown on SIP pause triggers | Neutralizes impulsive loss-aversion panic selling |
+| **Step-Down SIP (50%)** | Halves monthly SIP amount for 3 months (₹15k $\rightarrow$ ₹7.5k) | Preserves >70% compounding trajectory during cashflow crunch |
+| **Skip Single Month** | Bypasses current month debit without cancelling auto-debit | Prevents habit fracture and bank mandate friction |
+| **SEBI 3:00 PM Cut-off Warning** | Live IST clock alerting of 2:50 PM – 3:00 PM cut-off rush | Prevents unintended T+1 settlement NAV slippage |
+| **Tax-Loss Harvesting (TLH)** | Tranche-level calculation of harvestable STCG/LTCG losses | Unlocks 20% tax alpha to offset annual capital gains |
+| **Zero-PII Privacy Architecture** | Anonymized token session (`anon_sec_...`) | Complies with SEBI data protection; zero PAN/bank logins stored |
+| **TradingView Charts** | Dark-mode canvas time-series NAV chart with crash simulation | Visualizes historical discount accumulation zones |
 
 ---
 
 ## 📐 Mathematical Formulation & Algorithms
 
 ### 1. Explainable AI Risk Score Formula
-The engine calculates an explainable risk score to determine whether an investor's emotional response breaches their calibrated risk barrier:
+The engine calculates an explainable risk score to determine whether an investor's action breaches their baseline risk barrier:
 
-$$\text{RiskScore} = w_1 \cdot \text{GoalDeficitScore} + w_2 \cdot \left(\frac{|\text{Drawdown}_{\%}|}{\text{India VIX}}\right) + w_3 \cdot \text{HistDeviationScore}$$
+$$\text{RiskScore} = w_1 \cdot \text{GoalDeficitScore} + w_2 \cdot \left(\frac{|\text{Drawdown}|}{\text{India VIX}}\right) + w_3 \cdot \text{HistDeviationScore}$$
 
 - **$w_1 = 0.45$**: Milestone timeline deficit weight.
 - **$w_2 = 0.35$**: Market fear & volatility ratio.
 - **$w_3 = 0.20$**: Historical behavioral inconsistency score.
 
 ### 2. Rupee Cost Averaging (RCA) Unit Accumulation Advantage
-$$\Delta \text{Units}_{\%} = \left( \frac{\text{NAV}_{\text{avg}} - \text{NAV}_{\text{current}}}{\text{NAV}_{\text{current}}} \right) \times 100$$
+$$\text{RCA Advantage (\%)} = \left( \frac{\text{NAV}_{\text{avg}} - \text{NAV}_{\text{current}}}{\text{NAV}_{\text{current}}} \right) \times 100$$
 
 During a -7.5% market dip with NAV at ₹88.40 vs 6-month average of ₹101.20:
-$$\Delta \text{Units}_{\%} = \left( \frac{101.20 - 88.40}{88.40} \right) \times 100 = +14.48\% \approx +14.5\%$$
+$$\text{RCA Advantage (\%)} = \left( \frac{101.20 - 88.40}{88.40} \right) \times 100 = +14.48\% \approx +14.5\%$$
 
 ### 3. Compounded Milestone Deficit
-$$\text{Deficit} = \sum_{t=1}^{n} \text{SIP} \cdot (1 + r)^{T - t} - \sum_{t=n+1}^{T} \text{StepDown} \cdot (1 + r)^{T - t}$$
+$$\text{Terminal Deficit} = \sum_{t=1}^{n} \text{SIP}_t \cdot (1 + r)^{T - t} - \sum_{t=n+1}^{T} \text{StepDown}_t \cdot (1 + r)^{T - t}$$
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Layer | Technology / Library | Purpose |
-|---|---|---|
-| **Framework** | [Next.js 15 (App Router)](https://nextjs.org/) | React Server Components, Edge API routes, Turbopack |
-| **UI Library** | [React 19](https://react.dev/) | Component architecture, client-side state hooks |
-| **Language** | [TypeScript 5.7](https://www.typescriptlang.org/) | End-to-end type safety, strict interface contracts |
-| **Styling** | [Tailwind CSS 3.4](https://tailwindcss.com/) | Custom Institutional Dark Mode (`#0c0e12`, `#14171f`, `#71649C`) |
-| **AI Intelligence** | [@google/generative-ai](https://www.npmjs.com/package/@google/generative-ai) | Google Gemini 1.5 Pro & Flash SDK integration |
-| **Data Visualization**| [Lightweight Charts 4.2](https://tradingview.github.io/lightweight-charts/) | High-performance canvas-based financial charts |
-| **Icons** | [Lucide React](https://lucide.dev/) | Accessible, sleek icon set |
-| **Hosting & CDN** | [Vercel](https://vercel.com/) | Global edge network & serverless execution |
+```
+Frontend Architecture:   Next.js 15 (App Router) + React 19 + TypeScript 5.7
+Design System:           Tailwind CSS 3.4 (Institutional Dark Mode #0c0e12, #14171f, #71649C)
+AI & Machine Learning:   Google Generative AI SDK (@google/generative-ai)
+                         • Google Gemini 1.5 Pro (Deep Portfolio Reasoning)
+                         • Google Gemini 1.5 Flash (Sub-200ms Cognitive Intervention)
+Financial Visualization: Lightweight Charts 4.2 (TradingView Canvas Engine) + SVG Deficit Simulator
+Icons & UI Tokens:       Lucide React 0.469
+Cloud Infrastructure:    Vercel Edge Network & Serverless Execution (Global CDN)
+```
 
 ---
 
@@ -126,7 +178,7 @@ The design and engineering of **The LIT Buddy** are grounded in peer-reviewed be
 
 ## 👥 Prototype Demo Walkthrough
 
-Try the live application directly at **[finlit-smoothoperators.vercel.app](https://finlit-smoothoperators.vercel.app/)**:
+Explore the live application directly at **[finlit-smoothoperators.vercel.app](https://finlit-smoothoperators.vercel.app/)**:
 
 - **Investor Persona:** Rouneet Raj Sinha (`rouneet.sinha@example.com`)
 - **Portfolio AUM:** ₹22,10,000 (₹22.1 Lakhs) across 5 mutual fund mandates
