@@ -7,7 +7,7 @@
 [![Google Gemini](https://img.shields.io/badge/AI%20Engine-Gemini%201.5%20Pro%20%26%20Flash-4285F4?style=for-the-badge&logo=google)](https://aistudio.google.com/)
 [![SEBI Compliant](https://img.shields.io/badge/SEBI-Zero--PII%20%26%20Fail--Open%20SLA-22c55e?style=for-the-badge&logo=shield)](https://www.sebi.gov.in/)
 
-> **Live Deployment:** [https://finlit-smoothoperators.vercel.app/](https://finlit-smoothoperators.vercel.app/)
+> **🌐 Live Production Deployment:** [https://finlit-smoothoperators.vercel.app/](https://finlit-smoothoperators.vercel.app/)
 
 ---
 
@@ -93,7 +93,7 @@ $$\text{Deficit} = \sum_{t=1}^{n} \text{SIP} \cdot (1 + r)^{T - t} - \sum_{t=n+1
 | **AI Intelligence** | [@google/generative-ai](https://www.npmjs.com/package/@google/generative-ai) | Google Gemini 1.5 Pro & Flash SDK integration |
 | **Data Visualization**| [Lightweight Charts 4.2](https://tradingview.github.io/lightweight-charts/) | High-performance canvas-based financial charts |
 | **Icons** | [Lucide React](https://lucide.dev/) | Accessible, sleek icon set |
-| **Deployment** | [Vercel](https://vercel.com/) | Edge routing, global CDN, and automated CI/CD |
+| **Hosting & CDN** | [Vercel](https://vercel.com/) | Global edge network & serverless execution |
 
 ---
 
@@ -124,51 +124,18 @@ The design and engineering of **The LIT Buddy** are grounded in peer-reviewed be
 
 ---
 
-## 🚀 Getting Started Locally
+## 👥 Prototype Demo Walkthrough
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/rxsinhaa/produpie.git
-cd produpie
-```
+Try the live application directly at **[finlit-smoothoperators.vercel.app](https://finlit-smoothoperators.vercel.app/)**:
 
-### 2. Install Dependencies
-```bash
-npm install
-```
-
-### 3. Configure Environment Variables
-Create a `.env.local` file in the root directory:
-```bash
-cp .env.example .env.local
-```
-Add your Google Gemini API key:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-> Obtain a free Gemini API key from [Google AI Studio](https://aistudio.google.com/).
-
-### 4. Run Development Server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 5. Production Build
-```bash
-npm run build
-npm run start
-```
-
----
-
-## 👥 Demo Profile
-
-- **Persona:** Rouneet Raj Sinha (`rouneet.sinha@example.com`)
-- **Portfolio AUM:** ₹22,10,000 (₹22.1 Lakhs)
-- **SIP Regularity Score:** 94% on-time execution
-- **Simulated Market Dip:** -7.5% localized mid-cap pullback (NAV ₹88.40 vs ₹101.20)
-- **Primary Milestone:** 2032 House Downpayment (Target: ₹25,00,000)
+- **Investor Persona:** Rouneet Raj Sinha (`rouneet.sinha@example.com`)
+- **Portfolio AUM:** ₹22,10,000 (₹22.1 Lakhs) across 5 mutual fund mandates
+- **Execution Regularity:** 94% on-time SIP debits (Compounding Health: 92/100)
+- **Simulated Market Scenario:** -7.5% market dip on Mid-Cap Growth SIP (Discount NAV ₹88.40 vs ₹101.20)
+- **Interactive Triggers:**
+  1. Click **"The LIT Buddy Report"** on the Compounding Health card to generate an on-demand portfolio audit with Gemini 1.5 Pro.
+  2. Click **"Pause SIP"** on the Nippon India Growth Mid-Cap Fund card to experience the 3-second Cognitive Circuit Breaker.
+  3. Toggle **"Pro Mode"** in the top navigation bar to inspect real-time SEBI cut-off clocks and zero-PII session tokens.
 
 ---
 
