@@ -6,11 +6,10 @@ import {
   IChartApi,
   ISeriesApi,
   ColorType,
-  UTCTimestamp,
   LineStyle,
 } from "lightweight-charts";
 import { GENERATE_TIME_SERIES } from "@/lib/constants";
-import { TrendingDown, Eye, Activity, BarChart2, Layers } from "lucide-react";
+import { TrendingDown, TrendingUp, Sparkles, Activity, Layers, BarChart2, ChevronDown, ChevronUp } from "lucide-react";
 
 interface TradingViewChartProps {
   isMarketCrashActive: boolean;
@@ -24,6 +23,8 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
+
+  const [showAdvancedMetrics, setShowAdvancedMetrics] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<"NAV" | "BENCHMARK" | "VIX">("NAV");
   const [hoverData, setHoverData] = useState<{
     date: string;
@@ -34,23 +35,26 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    // Strict institutional dark mode chart configuration per PRD specification:
-    // - Background: #222222 solid
-    // - Axis text: #DDDDDD
-    // - Grid lines: #444444
-    // - Scale borders: #71649C
+    // Institutional dark mode chart configuration per PRD specification:
+    // Background: #222222 solid, Text: #DDDDDD, Grid: #444444 (subtle), Border: #71649C
     const chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
-      height: 380,
+      height: 360,
       layout: {
         background: { type: ColorType.Solid, color: "#222222" },
         textColor: "#DDDDDD",
         fontSize: 12,
-        fontFamily: "var(--font-inter), -apple-system, sans-serif",
+        fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif",
       },
       grid: {
-        vertLines: { color: "#444444", style: LineStyle.Dotted },
-        horzLines: { color: "#444444", style: LineStyle.Dotted },
+        vertLines: {
+          color: showAdvancedMetrics ? "#444444" : "rgba(68, 68, 68, 0.4)",
+          style: LineStyle.Dotted,
+        },
+        horzLines: {
+          color: showAdvancedMetrics ? "#444444" : "rgba(68, 68, 68, 0.4)",
+          style: LineStyle.Dotted,
+        },
       },
       crosshair: {
         mode: 1,
@@ -84,19 +88,18 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     chartInstanceRef.current = chart;
 
-    // Create Area series with calm Navy/Amber hues
+    // Area series with calm Navy/Lavender tones
     const areaSeries = chart.addAreaSeries({
-      topColor: "rgba(51, 78, 104, 0.65)", // Calm Navy top
-      bottomColor: "rgba(16, 42, 67, 0.05)",
-      lineColor: "#486581", // Calm Navy Accent line
+      topColor: "rgba(113, 100, 156, 0.55)", // #71649C gradient top
+      bottomColor: "rgba(18, 21, 29, 0.05)",
+      lineColor: "#71649C",
       lineWidth: 2,
     });
 
     seriesRef.current = areaSeries;
 
-    // Generate and set data
+    // Generate time series data
     const rawData = GENERATE_TIME_SERIES();
-    // If crash is toggled off, replace the final 15 crash days with continued gentle upward drift
     const formattedData = rawData.map((item, idx) => {
       let val = item.value;
       if (!isMarketCrashActive && idx >= 165) {
@@ -110,7 +113,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     areaSeries.setData(formattedData);
 
-    // Contrarian Accumulation markers (demonstrating Rupee Cost Averaging)
+    // Contrarian Accumulation Milestone Markers
     if (isMarketCrashActive) {
       const lastIndex = formattedData.length - 1;
       const markerData = [
@@ -119,24 +122,23 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
           position: "aboveBar" as const,
           color: "#71649C",
           shape: "circle" as const,
-          text: "Pre-Correction NAV (₹101.2)",
+          text: "Pre-Dip NAV (₹101.2)",
         },
         {
           time: formattedData[lastIndex].time,
           position: "belowBar" as const,
-          color: "#fbbf24", // Calm Amber
+          color: "#fbbf24",
           shape: "arrowUp" as const,
-          text: "RCA Buy Opportunity (+12.4% units)",
+          text: "Sale Window (+12.6% units/₹)",
         },
       ];
-      // Sort in ascending order by time
       const sortedMarkers = [...markerData].sort((a, b) =>
         String(a.time).localeCompare(String(b.time))
       );
       areaSeries.setMarkers(sortedMarkers);
     }
 
-    // Subscribe to crosshair move
+    // Subscribe to crosshair
     chart.subscribeCrosshairMove((param) => {
       if (
         param.point === undefined ||
@@ -166,7 +168,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       }
     });
 
-    // Set initial hover data to latest point
+    // Set initial hover data
     const last = formattedData[formattedData.length - 1];
     const first = formattedData[0];
     setHoverData({
@@ -175,10 +177,8 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       change: parseFloat((((last.value - first.value) / first.value) * 100).toFixed(2)),
     });
 
-    // Fit content
     chart.timeScale().fitContent();
 
-    // Responsive resize handler
     const handleResize = () => {
       if (chartContainerRef.current && chartInstanceRef.current) {
         chartInstanceRef.current.applyOptions({
@@ -189,7 +189,6 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
 
     window.addEventListener("resize", handleResize);
 
-    // CRITICAL: Strict React cleanup to remove canvas & prevent memory leaks
     return () => {
       window.removeEventListener("resize", handleResize);
       if (chartInstanceRef.current) {
@@ -197,75 +196,94 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
         chartInstanceRef.current = null;
       }
     };
-  }, [isMarketCrashActive, activeView]);
+  }, [isMarketCrashActive, activeView, showAdvancedMetrics]);
 
   return (
-    <div className="relative rounded-xl border border-[#71649C]/40 bg-[#222222] p-4 shadow-2xl">
+    <div className="relative rounded-3xl border border-[#71649C]/40 bg-[#222222] p-5 shadow-2xl shadow-black/60">
       {/* Chart Header Bar */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-[#444444] pb-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-[#444444] pb-3.5">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-calm-amber-400"></span>
-            <h3 className="font-semibold text-slate-100">{selectedFundName}</h3>
-            <span className="rounded bg-calm-navy-900 border border-[#71649C] px-2 py-0.5 text-[11px] font-mono text-[#DDDDDD]">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-calm-amber-400"></span>
+            <h3 className="font-bold text-base text-slate-100">{selectedFundName}</h3>
+            <span className="rounded-md bg-[#161a24] border border-[#71649C]/60 px-2 py-0.5 text-[10px] font-mono text-[#DDDDDD]">
               INF204K01129
             </span>
           </div>
           <p className="mt-0.5 text-xs text-slate-400">
-            Institutional Net Asset Value (NAV) & Time-Series Compounding Pane
+            Net Asset Value (NAV) Trajectory & Systematic Compounding Timeline
           </p>
         </div>
 
-        {/* Series Switchers */}
-        <div className="flex items-center space-x-1.5 rounded-lg border border-[#444444] bg-[#1a1e29] p-1">
+        {/* Show Advanced Metrics Toggle */}
+        <div className="flex items-center space-x-2">
           <button
-            onClick={() => setActiveView("NAV")}
-            className={`flex items-center space-x-1 rounded px-2.5 py-1 text-xs font-medium transition ${
-              activeView === "NAV"
-                ? "bg-calm-navy-700 text-slate-100 shadow"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
+            onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
+            className="flex items-center space-x-1.5 rounded-xl border border-[#444444] bg-[#1a1e29] px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:border-slate-500 transition"
           >
-            <BarChart2 className="h-3 w-3" />
-            <span>Historical NAV</span>
-          </button>
-          <button
-            onClick={() => setActiveView("BENCHMARK")}
-            className={`flex items-center space-x-1 rounded px-2.5 py-1 text-xs font-medium transition ${
-              activeView === "BENCHMARK"
-                ? "bg-calm-navy-700 text-slate-100 shadow"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <Layers className="h-3 w-3" />
-            <span>Nifty Midcap 150</span>
-          </button>
-          <button
-            onClick={() => setActiveView("VIX")}
-            className={`flex items-center space-x-1 rounded px-2.5 py-1 text-xs font-medium transition ${
-              activeView === "VIX"
-                ? "bg-calm-navy-700 text-slate-100 shadow"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <Activity className="h-3 w-3 text-calm-amber-400" />
-            <span>India VIX (14.8)</span>
+            <Activity className="h-3.5 w-3.5 text-[#71649C]" />
+            <span>{showAdvancedMetrics ? "Hide Advanced Metrics" : "Show Advanced Metrics"}</span>
+            {showAdvancedMetrics ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
           </button>
         </div>
       </div>
 
-      {/* Floating Institutional Metrics Bar */}
+      {/* Advanced Metrics Sub-bar (Unfolds when toggled) */}
+      {showAdvancedMetrics && (
+        <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[#444444] bg-[#1a1e29] p-2 text-xs animate-in fade-in">
+          <span className="text-[11px] text-slate-400 font-mono px-2">
+            Institutional Overlays:
+          </span>
+          <div className="flex items-center space-x-1.5">
+            <button
+              onClick={() => setActiveView("NAV")}
+              className={`flex items-center space-x-1 rounded-lg px-2.5 py-1 text-xs font-medium transition ${
+                activeView === "NAV"
+                  ? "bg-[#71649C] text-white shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <BarChart2 className="h-3 w-3" />
+              <span>Historical NAV</span>
+            </button>
+            <button
+              onClick={() => setActiveView("BENCHMARK")}
+              className={`flex items-center space-x-1 rounded-lg px-2.5 py-1 text-xs font-medium transition ${
+                activeView === "BENCHMARK"
+                  ? "bg-[#71649C] text-white shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Layers className="h-3 w-3" />
+              <span>Nifty Midcap 150</span>
+            </button>
+            <button
+              onClick={() => setActiveView("VIX")}
+              className={`flex items-center space-x-1 rounded-lg px-2.5 py-1 text-xs font-medium transition ${
+                activeView === "VIX"
+                  ? "bg-[#71649C] text-white shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Activity className="h-3 w-3 text-calm-amber-400" />
+              <span>India VIX ({isMarketCrashActive ? "14.8" : "11.2"})</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Hover & Performance Metric Cards */}
       {hoverData && (
-        <div className="mb-2 flex flex-wrap items-center gap-4 text-xs font-mono">
-          <div className="flex items-center space-x-1.5">
+        <div className="mb-3 flex flex-wrap items-center gap-3 text-xs font-mono">
+          <div className="rounded-xl bg-[#14171f] border border-[#38425d] px-3 py-1.5 flex items-center space-x-1.5">
             <span className="text-slate-400">Date:</span>
-            <span className="text-slate-200 font-semibold">{hoverData.date}</span>
+            <span className="text-slate-100 font-semibold">{hoverData.date}</span>
           </div>
-          <div className="flex items-center space-x-1.5">
+          <div className="rounded-xl bg-[#14171f] border border-[#38425d] px-3 py-1.5 flex items-center space-x-1.5">
             <span className="text-slate-400">NAV:</span>
-            <span className="text-slate-100 font-bold text-sm">₹{hoverData.nav.toFixed(2)}</span>
+            <span className="text-calm-amber-400 font-bold text-sm">₹{hoverData.nav.toFixed(2)}</span>
           </div>
-          <div className="flex items-center space-x-1.5">
+          <div className="rounded-xl bg-[#14171f] border border-[#38425d] px-3 py-1.5 flex items-center space-x-1.5">
             <span className="text-slate-400">6-Mo Return:</span>
             <span
               className={`font-semibold ${
@@ -276,32 +294,35 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
               {hoverData.change}%
             </span>
           </div>
+
           {isMarketCrashActive && (
-            <div className="rounded bg-calm-amber-900/30 border border-calm-amber-700/50 px-2 py-0.5 text-[11px] text-calm-amber-300">
-              ⚡ Localized Drawdown Active: -7.5% (Units on 12.6% discount)
+            <div className="flex-1 rounded-xl bg-calm-amber-950/40 border border-calm-amber-600/50 px-3 py-1.5 text-xs text-calm-amber-200 flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-calm-amber-400 shrink-0" />
+              <span>
+                <strong>Discount Active:</strong> Units are 12.6% cheaper than average. Your ₹15k SIP acquires +14.5% more units today!
+              </span>
             </div>
           )}
         </div>
       )}
 
-      {/* TradingView Chart Container with mandated #222 background & #71649C border */}
+      {/* TradingView Canvas Container with mandated #222 background */}
       <div
         ref={chartContainerRef}
-        className="w-full rounded-lg overflow-hidden"
-        style={{ minHeight: "380px" }}
+        className="w-full rounded-2xl overflow-hidden"
+        style={{ minHeight: "360px" }}
       />
 
-      {/* Institutional Footer Stamp */}
-      <div className="mt-3 flex items-center justify-between border-t border-[#444444] pt-2 text-[11px] text-slate-400">
+      {/* Friendly Footer Note */}
+      <div className="mt-3.5 flex items-center justify-between border-t border-[#444444] pt-2.5 text-[11px] text-slate-400">
         <div className="flex items-center space-x-2">
-          <span>Powered by TradingView Lightweight Charts™</span>
+          <span>Lightweight Charts™ Engine</span>
           <span>•</span>
-          <span className="text-[#DDDDDD]">Grid: #444444</span>
-          <span>•</span>
-          <span className="text-[#71649C]">Scale: #71649C</span>
+          <span className="text-slate-300">#222 Theme</span>
         </div>
-        <div className="text-slate-400">
-          Actuarial Unit Compounding Stream Active
+        <div className="text-calm-green-400 font-medium flex items-center gap-1">
+          <Sparkles className="h-3 w-3" />
+          <span>Rupee Cost Averaging Safeguard Active</span>
         </div>
       </div>
     </div>

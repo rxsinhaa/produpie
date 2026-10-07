@@ -26,6 +26,8 @@ import {
   ChevronUp,
   Cpu,
   Lock,
+  X,
+  Zap,
 } from "lucide-react";
 
 interface FinLitInterceptModalProps {
@@ -50,7 +52,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
   riskResult,
   onSelectAlternative,
 }) => {
-  // Calculated Friction: 3-second execution countdown
+  // Calculated Friction: 3-second deliberate review countdown
   const [countdown, setCountdown] = useState<number>(3);
   const [canExecutePause, setCanExecutePause] = useState<boolean>(false);
   const [pauseMonths, setPauseMonths] = useState<number>(3);
@@ -93,88 +95,118 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
   const rcaPercentage = riskResult.xaiAudit.rcaUnitDiscountPct;
   const currentUnitsPurchased = (holding.monthlyAmount / holding.currentNav).toFixed(2);
   const avgUnitsPurchased = (holding.monthlyAmount / holding.avgNav).toFixed(2);
-
   const stepDownMonthlyAmount = Math.round(holding.monthlyAmount * 0.5);
 
+  // Calculate dynamic impact based on selected pause months
+  const estimatedDelayMonths = Math.max(
+    1,
+    Math.round(riskResult.xaiAudit.projectedMilestoneDelayMonths * (pauseMonths / 3))
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
       <div
         ref={modalRef}
-        className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl border border-calm-amber-600/40 bg-[#12151d] p-5 sm:p-7 shadow-2xl text-slate-100"
+        className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl border border-calm-amber-600/40 bg-[#12151d] p-5 sm:p-8 shadow-2xl text-slate-100"
       >
-        {/* Top Header: Calm Cognitive Circuit Breaker Banner (NO PANIC RED) */}
+        {/* Top Header: Calm Cognitive Circuit Breaker Banner (NO ALARMING RED) */}
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#242938] pb-4">
-          <div className="flex items-start space-x-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-calm-amber-900/40 border border-calm-amber-500/50 text-calm-amber-400 shadow-sm">
+          <div className="flex items-start space-x-3.5">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-calm-amber-900/40 border border-calm-amber-500/50 text-calm-amber-400 shadow-md">
               <ShieldAlert className="h-6 w-6" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <span className="rounded bg-calm-amber-900/60 border border-calm-amber-600/60 px-2 py-0.5 text-[11px] font-bold text-calm-amber-300 uppercase tracking-wider">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-calm-amber-500/20 border border-calm-amber-500/50 px-2.5 py-0.5 text-[11px] font-bold text-calm-amber-300 uppercase tracking-wider">
                   Cognitive Circuit Breaker
                 </span>
-                <span className="rounded bg-calm-navy-800/80 border border-calm-navy-600 px-2 py-0.5 text-[11px] font-mono text-slate-300">
-                  Sub-200ms Latency SLA: {riskResult.latencyMs}ms
+                <span className="rounded-full bg-[#1e2433] border border-[#282e3e] px-2.5 py-0.5 text-[11px] font-mono text-slate-300">
+                  Sub-200ms Latency: {riskResult.latencyMs}ms
                 </span>
               </div>
-              <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-100">
-                FinLit Compounding Intercept: {holding.fundName}
+              <h2 className="mt-1.5 text-xl sm:text-2xl font-extrabold tracking-tight text-slate-100">
+                Wait! Pausing delays your {goal.title} ({goal.targetYear})
               </h2>
-              <p className="text-xs text-slate-400">
-                Deterministic math intervention anchored to your{" "}
-                <span className="text-slate-200 font-semibold">{goal.title}</span> ({goal.targetYear})
+              <p className="text-xs text-slate-400 mt-0.5">
+                Targeting <span className="text-slate-200 font-semibold">{holding.fundName}</span> • Anchored to your {goal.title}
               </p>
             </div>
           </div>
 
-          {/* Close / Dismiss */}
+          {/* Dismiss Button */}
           <button
             onClick={onClose}
-            className="rounded-lg border border-slate-700 bg-[#1a1e29] p-2 text-slate-400 hover:text-slate-200 transition"
+            className="rounded-xl border border-slate-700 bg-[#1a1e29] p-2 text-slate-400 hover:text-slate-200 transition"
           >
-            ✕
+            <X className="h-5 w-5" />
           </button>
+        </div>
+
+        {/* Large Prominent Goal Deficit & Impact Callout */}
+        <div className="mt-5 rounded-2xl border border-calm-amber-500/50 bg-gradient-to-r from-calm-amber-950/40 via-[#181c26] to-[#14171f] p-4 sm:p-5 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-xs font-bold text-calm-amber-400 uppercase tracking-wider">
+                Milestone Impact Reality
+              </span>
+              <div className="text-xl sm:text-2xl font-black text-slate-50 tracking-tight">
+                Pausing for {pauseMonths} {pauseMonths === 1 ? "month" : "months"} delays your{" "}
+                <span className="text-calm-amber-300">{goal.title}</span> by ~{estimatedDelayMonths} months
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed pt-0.5">
+                During market dips, pausing prevents you from acquiring fund units at discounted prices, forcing you to invest more money later to hit the same ₹{(goal.targetAmount / 100000).toFixed(1)} Lakh target.
+              </p>
+            </div>
+
+            <div className="shrink-0 rounded-2xl bg-[#0c0e12] border border-[#282e3e] p-3 text-center sm:min-w-[150px]">
+              <span className="text-[10px] text-slate-400 block uppercase font-medium">Unit Discount</span>
+              <span className="text-xl font-extrabold text-calm-green-400 font-mono">
+                +{rcaPercentage}%
+              </span>
+              <span className="text-[10px] text-slate-400 block mt-0.5">More units per ₹1k</span>
+            </div>
+          </div>
         </div>
 
         {/* Real-time SEBI Cut-off Alert (Triggered if 2:50 PM - 3:00 PM IST) */}
         {riskResult.sebiCutoffWarning && (
-          <div className="mt-4 flex items-start space-x-3 rounded-xl border border-calm-amber-500/70 bg-calm-amber-950/40 p-3.5 text-calm-amber-200">
+          <div className="mt-4 flex items-start space-x-3 rounded-2xl border border-calm-amber-500/70 bg-calm-amber-950/40 p-4 text-calm-amber-200 shadow-md">
             <Clock className="h-5 w-5 shrink-0 text-calm-amber-400 mt-0.5 animate-spin" />
             <div className="text-xs space-y-1">
               <div className="flex items-center space-x-2">
                 <span className="font-bold text-calm-amber-300 text-sm">
                   ⚠️ SEBI 3:00 PM Cut-off Warning ({riskResult.sebiTimestampInfo.currentTimeIST})
                 </span>
-                <span className="rounded bg-calm-amber-500/20 px-1.5 py-0.5 text-[10px] font-mono font-bold text-calm-amber-300">
+                <span className="rounded-full bg-calm-amber-500/20 px-2 py-0.5 text-[9px] font-mono font-bold text-calm-amber-300 uppercase">
                   T+1 SETTLEMENT SHIFT
                 </span>
               </div>
               <p className="text-calm-amber-100/90 leading-relaxed">
-                You initiated this pause during the SEBI 2:50 PM - 3:00 PM mutual fund cut-off window. The deliberate 3-second friction verification delay will push transaction transmission past 3:00 PM IST into a <strong>T+1 settlement cycle</strong> at tomorrow's unknown closing NAV!
+                You initiated this request during the 2:50 PM - 3:00 PM cut-off window. The deliberate 3-second friction review delay pushes transmission past 3:00 PM IST into a <strong>T+1 settlement cycle</strong> at tomorrow's unknown closing NAV.
               </p>
             </div>
           </div>
         )}
 
-        {/* Explainable AI (XAI) Mathematical Reality Banner */}
-        <div className="mt-4 rounded-xl border border-calm-navy-600/70 bg-calm-navy-900/40 p-4">
+        {/* Explainable AI (XAI) Rupee Cost Averaging Fact */}
+        <div className="mt-4 rounded-2xl border border-calm-navy-600/60 bg-calm-navy-900/30 p-4">
           <div className="flex items-center space-x-2 text-xs font-semibold text-calm-amber-400 uppercase tracking-wide">
             <Sparkles className="h-4 w-4" />
-            <span>Deterministic XAI Unit-Accumulation Fact</span>
+            <span>Explainable AI (XAI) Unit Accumulation Fact</span>
           </div>
-          <p className="mt-1 text-sm text-slate-200 font-medium leading-relaxed">
-            &ldquo;Your <span className="text-calm-amber-300 font-bold font-mono">₹{holding.monthlyAmount.toLocaleString("en-IN")}</span> contribution acquires{" "}
-            <span className="text-calm-green-400 font-bold font-mono">+{rcaPercentage}% more units</span> today ({currentUnitsPurchased} units @ ₹{holding.currentNav}) than your 6-month average NAV ({avgUnitsPurchased} units @ ₹{holding.avgNav}).&rdquo;
+          <p className="mt-1.5 text-sm text-slate-200 font-medium leading-relaxed">
+            &ldquo;Your <span className="text-calm-amber-300 font-bold font-mono">₹{holding.monthlyAmount.toLocaleString("en-IN")}</span> monthly contribution acquires{" "}
+            <span className="text-calm-green-400 font-bold font-mono">+{rcaPercentage}% more units</span> today ({currentUnitsPurchased} units @ ₹{holding.currentNav}) compared to your 6-month average NAV ({avgUnitsPurchased} units @ ₹{holding.avgNav}).&rdquo;
           </p>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-400 font-mono">
-            <span className="bg-[#14171f] px-2 py-0.5 rounded border border-[#282e3e]">
-              Current NAV: ₹{holding.currentNav.toFixed(2)}
+          <div className="mt-2 flex flex-wrap items-center gap-2.5 text-xs text-slate-400 font-mono">
+            <span className="bg-[#14171f] px-2.5 py-1 rounded-lg border border-[#282e3e]">
+              Current Discounted NAV: ₹{holding.currentNav.toFixed(2)}
             </span>
-            <span className="bg-[#14171f] px-2 py-0.5 rounded border border-[#282e3e]">
-              6-Mo Avg NAV: ₹{holding.avgNav.toFixed(2)}
+            <span className="bg-[#14171f] px-2.5 py-1 rounded-lg border border-[#282e3e]">
+              6-Month Avg NAV: ₹{holding.avgNav.toFixed(2)}
             </span>
-            <span className="text-calm-green-400">
-              Rupee Cost Averaging (RCA) in contrarian effect
+            <span className="text-calm-green-400 font-medium">
+              Rupee Cost Averaging in effect
             </span>
           </div>
         </div>
@@ -190,72 +222,72 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
         </div>
 
         {/* Smart Liquidity & Root-Cause Diagnostic Prompt */}
-        <div className="mt-4 rounded-xl border border-[#282e3e] bg-[#161a24] p-4">
+        <div className="mt-4 rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <HelpCircle className="h-4 w-4 text-calm-amber-400" />
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
-                Diagnostic Probing: Root Cause Evaluation
+                Diagnostic: Why are you pausing?
               </h4>
             </div>
             <button
               onClick={() => setShowLiquidityDiagnostic(!showLiquidityDiagnostic)}
-              className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1"
+              className="text-xs text-calm-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
             >
-              {showLiquidityDiagnostic ? "Hide Diagnostic" : "Why are you pausing?"}{" "}
+              {showLiquidityDiagnostic ? "Hide Diagnostic" : "Help Me Decide"}{" "}
               {showLiquidityDiagnostic ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
             </button>
           </div>
 
           {showLiquidityDiagnostic && (
-            <div className="mt-3 space-y-3 pt-2 border-t border-[#242938]">
+            <div className="mt-3.5 space-y-3 pt-3 border-t border-[#242938]">
               <p className="text-xs text-slate-300">
-                Is this pause driven by temporary market anxiety or an acute cash-flow/emergency cash constraint?
+                Is this pause driven by temporary market anxiety or an immediate cash-flow / emergency need?
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <button
                   onClick={() => setIsCashflowEmergency(false)}
-                  className={`rounded-lg border p-2.5 text-left text-xs transition ${
+                  className={`rounded-xl border p-3 text-left text-xs transition ${
                     isCashflowEmergency === false
-                      ? "border-calm-navy-500 bg-calm-navy-800 text-slate-100"
+                      ? "border-calm-navy-500 bg-calm-navy-800 text-slate-100 ring-1 ring-calm-navy-500"
                       : "border-[#282e3e] bg-[#14171f] text-slate-400 hover:border-slate-600"
                   }`}
                 >
                   <span className="font-semibold block text-slate-200">
-                    📉 Market Drawdown Anxiety
+                    📉 Market Drop Unease
                   </span>
-                  <span className="text-[11px] text-slate-400 mt-0.5 block">
-                    Concerned by negative paper returns (-7.5% crash).
+                  <span className="text-[11px] text-slate-400 mt-1 block">
+                    Concerned by recent negative returns (-7.5% pullback).
                   </span>
                 </button>
 
                 <button
                   onClick={() => setIsCashflowEmergency(true)}
-                  className={`rounded-lg border p-2.5 text-left text-xs transition ${
+                  className={`rounded-xl border p-3 text-left text-xs transition ${
                     isCashflowEmergency === true
-                      ? "border-calm-amber-500 bg-calm-amber-900/40 text-calm-amber-200"
+                      ? "border-calm-amber-500 bg-calm-amber-950/40 text-calm-amber-200 ring-1 ring-calm-amber-500"
                       : "border-[#282e3e] bg-[#14171f] text-slate-400 hover:border-slate-600"
                   }`}
                 >
                   <span className="font-semibold block text-calm-amber-300">
-                    💸 Lack of Funds / Cashflow Constraint
+                    💸 Urgent Cash Need
                   </span>
-                  <span className="text-[11px] text-slate-400 mt-0.5 block">
-                    Immediate liquidity required for urgent living expenses.
+                  <span className="text-[11px] text-slate-400 mt-1 block">
+                    Need immediate cashflow relief for unexpected living expenses.
                   </span>
                 </button>
               </div>
 
-              {/* Dynamic Virtual Accountant Guidance Based on Diagnostic */}
+              {/* Dynamic Virtual Accountant Guidance */}
               {isCashflowEmergency === true && (
-                <div className="rounded-lg border border-calm-green-700/60 bg-calm-green-950/30 p-3 text-xs text-calm-green-200 space-y-1">
+                <div className="rounded-xl border border-calm-green-700/60 bg-calm-green-950/30 p-3.5 text-xs text-calm-green-200 space-y-1.5 animate-in fade-in">
                   <div className="flex items-center space-x-1.5 font-bold text-calm-green-300">
                     <CheckCircle2 className="h-4 w-4" />
                     <span>Virtual Accountant Cashflow Strategy:</span>
                   </div>
                   <p className="text-[11px] leading-relaxed">
                     We recommend pausing this high-beta Midcap SIP, but keeping your{" "}
-                    <strong>ICICI Liquid Fund</strong> and <strong>ELSS Tax Saver (Sec 80C)</strong> mandates active. This frees up ₹15,000 in monthly cashflow while safeguarding your ₹46,800 tax deduction and emergency liquidity buffer!
+                    <strong>ICICI Liquid Fund</strong> and <strong>ELSS Tax Saver (Sec 80C)</strong> active. This frees up ₹15,000 monthly cashflow while preserving your ₹46,800 tax deduction!
                   </p>
                 </div>
               )}
@@ -263,14 +295,14 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
           )}
         </div>
 
-        {/* Structured Smart Financial Alternatives */}
+        {/* Structured Smart Financial Alternatives (Protect Compounding) */}
         <div className="mt-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
               <Sparkles className="h-4 w-4 text-calm-amber-400" />
-              Structured Financial Alternatives (Protect Compounding)
+              Smart Alternatives (Recommended)
             </h3>
-            <span className="text-[11px] text-slate-400">Select an action</span>
+            <span className="text-[11px] text-slate-400">Choose the best path for your goals</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -282,23 +314,23 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
                   months: 3,
                 })
               }
-              className="group relative cursor-pointer rounded-xl border border-calm-green-600/70 bg-gradient-to-b from-calm-green-950/40 to-[#12151d] p-4 text-left shadow-lg hover:border-calm-green-500 hover:shadow-calm-green-900/30 transition"
+              className="group relative cursor-pointer rounded-2xl border border-calm-green-600/70 bg-gradient-to-b from-calm-green-950/40 to-[#12151d] p-4 sm:p-5 text-left shadow-lg hover:border-calm-green-500 hover:shadow-calm-green-900/30 transition active:scale-98"
             >
-              <div className="absolute top-3 right-3 rounded bg-calm-green-500/20 border border-calm-green-500/40 px-1.5 py-0.5 text-[9px] font-bold text-calm-green-300 uppercase">
-                Recommended (P1)
+              <div className="absolute top-3 right-3 rounded-full bg-calm-green-500/20 border border-calm-green-500/40 px-2 py-0.5 text-[9px] font-bold text-calm-green-300 uppercase">
+                Recommended
               </div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-calm-green-900/60 text-calm-green-400 border border-calm-green-700/60 mb-2">
-                <Scissors className="h-4 w-4" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-calm-green-900/60 text-calm-green-400 border border-calm-green-700/60 mb-3">
+                <Scissors className="h-5 w-5" />
               </div>
               <h4 className="text-sm font-bold text-slate-100 group-hover:text-calm-green-300 transition">
                 Step-Down SIP (3 Months)
               </h4>
-              <p className="mt-1 text-xs text-slate-300">
-                Reduce from <span className="line-through text-slate-500">₹{holding.monthlyAmount.toLocaleString("en-IN")}</span> to{" "}
+              <p className="mt-1 text-xs text-slate-300 leading-relaxed">
+                Reduce contribution from <span className="line-through text-slate-500">₹{holding.monthlyAmount.toLocaleString("en-IN")}</span> to{" "}
                 <strong className="text-calm-green-400 font-mono">₹{stepDownMonthlyAmount.toLocaleString("en-IN")}/mo</strong> for 3 months.
               </p>
-              <div className="mt-3 flex items-center justify-between border-t border-[#242938] pt-2 text-[11px] text-calm-green-400 font-medium">
-                <span>Preserves 70% of trajectory</span>
+              <div className="mt-3.5 flex items-center justify-between border-t border-[#242938] pt-2 text-[11px] text-calm-green-400 font-semibold">
+                <span>Protects 70%+ compounding</span>
                 <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition" />
               </div>
             </div>
@@ -306,18 +338,18 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
             {/* Alternative 2: Skip Single Month */}
             <div
               onClick={() => onSelectAlternative("SKIP_SINGLE")}
-              className="group cursor-pointer rounded-xl border border-calm-navy-500/70 bg-gradient-to-b from-calm-navy-900/40 to-[#12151d] p-4 text-left shadow hover:border-calm-navy-400 transition"
+              className="group cursor-pointer rounded-2xl border border-calm-navy-500/70 bg-gradient-to-b from-calm-navy-900/40 to-[#12151d] p-4 sm:p-5 text-left shadow hover:border-calm-navy-400 transition active:scale-98"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-calm-navy-800 text-calm-navy-100 border border-calm-navy-600 mb-2">
-                <Calendar className="h-4 w-4" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-calm-navy-800 text-slate-100 border border-calm-navy-600 mb-3">
+                <Calendar className="h-5 w-5" />
               </div>
               <h4 className="text-sm font-bold text-slate-100 group-hover:text-blue-300 transition">
-                Skip Current Month Only
+                Skip This Month Only
               </h4>
-              <p className="mt-1 text-xs text-slate-300">
-                Skip this month&apos;s debit without cancelling the bank NACH mandate or breaking your compounding habit.
+              <p className="mt-1 text-xs text-slate-300 leading-relaxed">
+                Skip just this single monthly debit without cancelling your auto-debit mandate or breaking your investment habit.
               </p>
-              <div className="mt-3 flex items-center justify-between border-t border-[#242938] pt-2 text-[11px] text-blue-400 font-medium">
+              <div className="mt-3.5 flex items-center justify-between border-t border-[#242938] pt-2 text-[11px] text-blue-400 font-semibold">
                 <span>Resumes next month</span>
                 <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition" />
               </div>
@@ -326,28 +358,28 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
             {/* Alternative 3: Contrarian Continuation */}
             <div
               onClick={() => onSelectAlternative("CONTINUE_SIP")}
-              className="group cursor-pointer rounded-xl border border-calm-amber-600/70 bg-gradient-to-b from-calm-amber-950/40 to-[#12151d] p-4 text-left shadow hover:border-calm-amber-500 transition"
+              className="group cursor-pointer rounded-2xl border border-calm-amber-600/70 bg-gradient-to-b from-calm-amber-950/40 to-[#12151d] p-4 sm:p-5 text-left shadow hover:border-calm-amber-500 transition active:scale-98"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-calm-amber-900/60 text-calm-amber-400 border border-calm-amber-700 mb-2">
-                <TrendingUp className="h-4 w-4" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-calm-amber-900/60 text-calm-amber-400 border border-calm-amber-700 mb-3">
+                <TrendingUp className="h-5 w-5" />
               </div>
               <h4 className="text-sm font-bold text-slate-100 group-hover:text-calm-amber-300 transition">
                 Continue Full SIP
               </h4>
-              <p className="mt-1 text-xs text-slate-300">
-                Keep the ₹{holding.monthlyAmount.toLocaleString("en-IN")}/mo compounding engine active to lock in discounted NAV units.
+              <p className="mt-1 text-xs text-slate-300 leading-relaxed">
+                Keep the ₹{holding.monthlyAmount.toLocaleString("en-IN")}/mo engine running to capture maximum discounted units during this dip.
               </p>
-              <div className="mt-3 flex items-center justify-between border-t border-[#242938] pt-2 text-[11px] text-calm-amber-400 font-medium">
-                <span>Max compounding velocity</span>
+              <div className="mt-3.5 flex items-center justify-between border-t border-[#242938] pt-2 text-[11px] text-calm-amber-400 font-semibold">
+                <span>Maximum compounding speed</span>
                 <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tax Loss Harvesting (TLH) Opportunity State (If user demands full redemption) */}
+        {/* Tax Loss Harvesting (TLH) Opportunity State (If user demands liquidation) */}
         {tlh.hasHarvestableLosses && (
-          <div className="mt-4 rounded-xl border border-[#282e3e] bg-[#14171f] p-3.5">
+          <div className="mt-4 rounded-2xl border border-[#282e3e] bg-[#14171f] p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <DollarSign className="h-4 w-4 text-calm-green-400" />
@@ -361,7 +393,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
               </div>
               <button
                 onClick={() => setShowTlhBreakdown(!showTlhBreakdown)}
-                className="text-xs text-slate-400 hover:text-slate-200"
+                className="text-xs text-calm-amber-400 hover:text-amber-300 font-medium"
               >
                 {showTlhBreakdown ? "Hide Tranches" : "View Tranches"}
               </button>
@@ -370,7 +402,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
             {showTlhBreakdown && (
               <div className="mt-3 space-y-2 border-t border-[#242938] pt-2 text-xs">
                 <p className="text-[11px] text-slate-400">
-                  If insisting on capital liquidation, harvest these underwater unit tranches to strategically offset current-year Short-Term Capital Gains (STCG @ 20%):
+                  If you insist on liquidating capital, harvest these underwater tranches to strategically offset current-year capital gains:
                 </p>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left font-mono text-[11px]">
@@ -405,53 +437,60 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
           </div>
         )}
 
-        {/* Calculated Friction Section: Primary "Pause Anyway" Button */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#242938] pt-4">
+        {/* Calculated Friction Section: Primary "Pause Anyway" Button (NO PANIC RED) */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#242938] pt-5">
           <div className="flex items-center space-x-2 text-xs text-slate-400">
             <Lock className="h-3.5 w-3.5 text-slate-500" />
             <span>
-              SEBI Algo-ID: <span className="font-mono text-slate-300">{riskResult.algoAuditId}</span>
+              Algo-ID: <span className="font-mono text-slate-300">{riskResult.algoAuditId}</span>
             </span>
           </div>
 
-          <div className="flex items-center space-x-3 w-full sm:w-auto">
-            {/* Primary "Pause Anyway" Action Button with Calculated 3-Second Delay Friction */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            {/* Calming Helper Text during countdown */}
+            {!canExecutePause && (
+              <span className="text-[11px] text-slate-400 text-center sm:text-right">
+                Please take a moment to review the impact above...
+              </span>
+            )}
+
+            {/* Primary "Pause Anyway" Button with Calculated 3-Second Friction (Strictly NO RED) */}
             <button
               onClick={() => onSelectAlternative("PAUSE_ANYWAY", { months: pauseMonths })}
               disabled={!canExecutePause}
-              className={`flex flex-1 sm:flex-initial items-center justify-center space-x-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition ${
+              className={`flex items-center justify-center space-x-2 rounded-2xl px-6 py-3 text-xs font-semibold transition shadow-md w-full sm:w-auto ${
                 canExecutePause
-                  ? "border border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
-                  : "border border-slate-800 bg-slate-900/60 text-slate-600 cursor-not-allowed"
+                  ? "border border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white active:scale-98"
+                  : "border border-slate-800 bg-slate-900/60 text-slate-500 cursor-not-allowed"
               }`}
             >
-              <Clock className={`h-3.5 w-3.5 ${!canExecutePause ? "animate-spin text-slate-500" : ""}`} />
+              <Clock className={`h-3.5 w-3.5 ${!canExecutePause ? "animate-spin text-calm-amber-400" : ""}`} />
               <span>
                 {canExecutePause
-                  ? `Execute Pause (${pauseMonths} Months)`
-                  : `Calculated Friction (${countdown}s delay)...`}
+                  ? `Pause Anyway (${pauseMonths} Months)`
+                  : `Please Review (${countdown}s delay)...`}
               </span>
             </button>
           </div>
         </div>
 
-        {/* Math Inspector Toggle */}
+        {/* Subtle Math Inspector Toggle for compliance review */}
         <div className="mt-4 text-center">
           <button
             onClick={() => setShowMathInspector(!showMathInspector)}
             className="text-[11px] text-slate-500 hover:text-slate-300 font-mono flex items-center justify-center gap-1 mx-auto"
           >
             <Cpu className="h-3 w-3" />
-            {showMathInspector ? "Hide Deterministic Math Breakdown" : "Inspect RiskScore Algorithm"}
+            {showMathInspector ? "Hide Math Formula Breakdown" : "Inspect Explainable AI Math"}
           </button>
 
           {showMathInspector && (
-            <div className="mt-2 rounded-lg border border-[#282e3e] bg-[#0c0e12] p-3 text-left font-mono text-[11px] text-slate-400 space-y-1">
+            <div className="mt-2.5 rounded-2xl border border-[#282e3e] bg-[#0c0e12] p-4 text-left font-mono text-[11px] text-slate-400 space-y-1.5 animate-in fade-in">
               <div className="text-calm-amber-400 font-bold">
                 Formula: RiskScore = w1(Goal Deficit) + w2(Market Drawdown / VIX) + w3(Historical Deviation)
               </div>
               <div>
-                • w1 = {riskResult.breakdown.w1_goalDeficitWeight} × Goal Deficit ({riskResult.breakdown.goalDeficitScore}) ={" "}
+                • w1 = {riskResult.breakdown.w1_goalDeficitWeight} × Deficit ({riskResult.breakdown.goalDeficitScore}) ={" "}
                 {(riskResult.breakdown.w1_goalDeficitWeight * riskResult.breakdown.goalDeficitScore).toFixed(3)}
               </div>
               <div>
@@ -462,7 +501,7 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
                 • w3 = {riskResult.breakdown.w3_histDeviationWeight} × Deviation ({riskResult.breakdown.histDeviationScore}) ={" "}
                 {(riskResult.breakdown.w3_histDeviationWeight * riskResult.breakdown.histDeviationScore).toFixed(3)}
               </div>
-              <div className="text-slate-200 font-bold pt-1 border-t border-[#1e2433]">
+              <div className="text-slate-200 font-bold pt-1.5 border-t border-[#1e2433]">
                 Total RiskScore: {riskResult.riskScore} (Breached Baseline Risk Barrier: {profile.riskBarrier.toFixed(2)})
               </div>
             </div>
@@ -472,3 +511,5 @@ export const FinLitInterceptModal: React.FC<FinLitInterceptModalProps> = ({
     </div>
   );
 };
+
+export default FinLitInterceptModal;

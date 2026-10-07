@@ -166,111 +166,147 @@ export const DEFAULT_PROFILE: BehavioralProfile = {
   sessionToken: "anon_sec_9f83a28c11e04b779bb65da1102e389b",
 };
 
+export interface FriendlyArchetypeInfo {
+  title: string;
+  badge: string;
+  summary: string;
+  tagline: string;
+  color: string;
+}
+
+export const getFriendlyArchetypeInfo = (barrier: number): FriendlyArchetypeInfo => {
+  if (barrier < 0.55) {
+    return {
+      title: "Long-Term Steady",
+      badge: "STEADY COMPOUNDER",
+      summary: "You prefer calm consistency and peace of mind. Your AI co-pilot will automatically recommend gentle step-down contributions during rough markets rather than stopping your compounding habit entirely.",
+      tagline: "Prioritizes emotional comfort & milestone stability",
+      color: "#fbbf24", // calm amber
+    };
+  }
+  if (barrier < 0.75) {
+    return {
+      title: "Disciplined Wealth Builder",
+      badge: "BALANCED DISCIPLINE",
+      summary: "You have a solid long-term mindset. You recognize that short-term volatility is normal and stay focused on your target milestone dates.",
+      tagline: "Stays the course through routine market cycles",
+      color: "#4ade80", // calm green
+    };
+  }
+  return {
+    title: "Dynamic Opportunity Seeker",
+    badge: "CONTRARIAN COMPOUNDER",
+    summary: "You look at market pullbacks as buying opportunities to accumulate more units at a discount, maximizing long-term compounding velocity.",
+    tagline: "Seizes discounted NAV opportunities during dips",
+    color: "#71649C", // purple accent
+  };
+};
+
 export const ONBOARDING_QUESTIONS: QuestionItem[] = [
   {
     id: "q1",
-    scenario: "Reaction to Unanticipated Market Pullbacks",
-    description: "If your ₹15,000 monthly equity SIP drops by 8% to 10% in two weeks showing a ₹20,000+ paper loss, what is your intuitive reaction?",
+    scenario: "How do you react to sudden market drops?",
+    description: "Imagine your ₹15,000 monthly SIP shows a temporary -8% paper drop over two weeks (e.g. down ₹20,000). What is your first instinct?",
     options: [
       {
-        label: "Pause SIP immediately to prevent further paper drawdown",
-        description: "Focuses on stopping immediate loss (High Myopic Loss Aversion).",
+        label: "I feel anxious and want to pause to protect my money",
+        description: "Focuses on immediate safety and peace of mind.",
         weight: 0.25,
       },
       {
-        label: "Feel nervous and check portfolio multiple times daily, debating a pause",
-        description: "Moderate loss aversion; seeks reassurance and guidance.",
+        label: "I feel uneasy and keep checking my balance, debating what to do",
+        description: "Seeks clarity and reassurance before deciding.",
         weight: 0.55,
       },
       {
-        label: "Acknowledge the drawdown as routine volatility; keep SIP running",
-        description: "Disciplined compounding mindset.",
+        label: "I stay calm and remember this is normal market noise",
+        description: "Committed to steady, uninterrupted long-term compounding.",
         weight: 0.75,
       },
       {
-        label: "Actively deploy surplus liquidity to accumulate discounted units",
-        description: "Contrarian value accumulator (High risk resilience).",
+        label: "I see it as a sale and want to invest even more at lower prices",
+        description: "Enthusiastic contrarian; values discounted fund units.",
         weight: 0.95,
       },
     ],
   },
   {
     id: "q2",
-    scenario: "Portfolio Checking Frequency",
-    description: "How frequently do you log in to check your mutual fund valuation or daily NAV?",
+    scenario: "How often do you like to check your investments?",
+    description: "Finding your ideal balance between staying informed and avoiding daily market stress.",
     options: [
       {
-        label: "Multiple times a day on mobile apps",
-        description: "Severe exposure to daily noise and Prospect Theory pain asymmetry.",
+        label: "Multiple times a day on my phone",
+        description: "High exposure to daily news fluctuations.",
         weight: 0.35,
       },
       {
-        label: "Once a week or after market news headlines",
-        description: "Periodic monitoring with emotional sensitivity to drawdowns.",
+        label: "Once a week or when major news happens",
+        description: "Keeps an eye on overall trends periodically.",
         weight: 0.6,
       },
       {
-        label: "Once a month during monthly SIP debit date",
-        description: "Healthy compounding posture with minimal noise distraction.",
+        label: "Once a month when my monthly SIP executes",
+        description: "Healthy hands-off compounding rhythm.",
         weight: 0.8,
       },
       {
-        label: "Quarterly or semi-annually during tax/milestone reviews",
-        description: "Institutional hands-off compounding posture.",
+        label: "Only a few times a year for milestone check-ins",
+        description: "Zen long-term investor; lets automated compounding work.",
         weight: 0.95,
       },
     ],
   },
   {
     id: "q3",
-    scenario: "Primary Milestone Horizon & Buffer",
-    description: "What is the timeline for your most critical life milestone (e.g., House Downpayment, Child's Education)?",
+    scenario: "What is the timeline for your main life goal?",
+    description: "Your investment horizon helps us calculate the exact time impact of any contribution changes.",
     options: [
       {
-        label: "Within the next 1 to 2 years (Near-term capital lock)",
-        description: "Low risk tolerance needed; high sensitivity to short-term volatility.",
+        label: "Near-term goal (Within the next 1 to 2 years)",
+        description: "Requires capital preservation and lower risk exposure.",
         weight: 0.3,
       },
       {
-        label: "3 to 6 years away (Medium-term milestone)",
-        description: "Balanced horizon requiring asset allocation discipline.",
+        label: "Medium-term goal (3 to 6 years away)",
+        description: "Balanced timeline allowing healthy equity growth.",
         weight: 0.6,
       },
       {
-        label: "6 to 12 years away (e.g., 2032 House or 2038 Higher Ed)",
-        description: "Long horizon capable of riding out multi-year market cycles.",
+        label: "Long-term goal (6 to 12 years away, e.g. 2032 House)",
+        description: "Ideal horizon to ride out full market cycles and compound.",
         weight: 0.8,
       },
       {
-        label: "15+ years away (Long-term retirement corpus)",
-        description: "Maximum compounding duration; drawdowns are accumulation boons.",
+        label: "Generational wealth or retirement (15+ years away)",
+        description: "Maximum compounding runway; market dips are wealth accelerators.",
         weight: 0.95,
       },
     ],
   },
   {
     id: "q4",
-    scenario: "Emergency Cash Buffer & Liquidity Runway",
-    description: "In case of sudden income disruption or unforeseen expenses, how many months of living expenses are in liquid/debt funds?",
+    scenario: "How is your emergency cash buffer?",
+    description: "Ensuring you have living expenses set aside so your equity investments never have to be forced-liquidated.",
     options: [
       {
-        label: "Less than 1 month (Tight cash-flow)",
-        description: "SIPs might be vulnerable to acute liquidity constraints.",
+        label: "Less than 1 month of living expenses",
+        description: "Tight cashflow; may need flexible contribution options.",
         weight: 0.3,
       },
       {
         label: "2 to 3 months of emergency runway",
-        description: "Moderate safety buffer; may need step-down flexibility.",
+        description: "Moderate cushion; benefits from step-down safety valves.",
         weight: 0.6,
       },
       {
-        label: "4 to 6 months in liquid & overnight instruments",
-        description: "Robust liquidity runway protecting equity compounding chain.",
+        label: "4 to 6 months in liquid savings & fixed deposits",
+        description: "Healthy safety cushion protecting long-term SIPs.",
         weight: 0.85,
       },
       {
-        label: "6+ months plus active family medical/term coverage",
-        description: "Fortress balance sheet allowing unhindered contrarian SIPs.",
+        label: "6+ months plus active family medical insurance",
+        description: "Fortress buffer; long-term investments remain 100% protected.",
         weight: 0.95,
       },
     ],

@@ -3,7 +3,7 @@
 import React, { useMemo } from "react";
 import { LifeGoal } from "@/types";
 import { FinLitMathEngine } from "@/lib/math-engine";
-import { TrendingDown, ArrowDownRight, Sparkles, CheckCircle, AlertCircle } from "lucide-react";
+import { TrendingDown, ArrowDownRight, Sparkles, CheckCircle, AlertCircle, Sliders } from "lucide-react";
 
 interface DeficitSimulatorSVGProps {
   goal: LifeGoal;
@@ -86,25 +86,25 @@ export const DeficitSimulatorSVG: React.FC<DeficitSimulatorSVGProps> = ({
   };
 
   return (
-    <div className="rounded-xl border border-calm-amber-600/30 bg-[#14171f] p-4 shadow-lg">
+    <div className="rounded-2xl border border-calm-amber-600/30 bg-[#14171f] p-4 sm:p-5 shadow-lg">
       {/* Simulator Header with Live Micro-slider */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#242938] pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#242938] pb-3.5">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-calm-amber-400 animate-pulse"></span>
-            <h4 className="text-sm font-semibold text-slate-100">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-calm-amber-400 animate-pulse"></span>
+            <h4 className="text-sm font-bold text-slate-100">
               Interactive Compounding Deficit Simulator
             </h4>
           </div>
-          <p className="text-xs text-slate-400">
-            Real-time actuarial projection for{" "}
+          <p className="text-xs text-slate-400 mt-0.5">
+            Real-time projection for{" "}
             <span className="text-slate-200 font-medium">{goal.title}</span> ({goal.targetYear})
           </p>
         </div>
 
         {/* Micro-Slider Control */}
-        <div className="flex items-center space-x-3 bg-[#1a1e29] border border-[#282e3e] rounded-lg px-3 py-1.5">
-          <span className="text-xs text-slate-400">Intended Pause:</span>
+        <div className="flex items-center space-x-3 bg-[#1a1e29] border border-[#282e3e] rounded-xl px-3.5 py-2">
+          <span className="text-xs text-slate-400 font-medium">Pause Duration:</span>
           <input
             type="range"
             min="1"
@@ -112,17 +112,17 @@ export const DeficitSimulatorSVG: React.FC<DeficitSimulatorSVGProps> = ({
             step="1"
             value={pauseMonths}
             onChange={(e) => onPauseMonthsChange(parseInt(e.target.value))}
-            className="micro-slider w-28 accent-amber-400 cursor-pointer"
+            className="micro-slider w-28 sm:w-32 accent-amber-400 cursor-pointer"
             id="pause-months-slider"
           />
-          <span className="min-w-[4.5rem] rounded bg-calm-amber-900/60 border border-calm-amber-600/50 px-2 py-0.5 text-center text-xs font-bold text-calm-amber-300">
+          <span className="min-w-[4.5rem] rounded-lg bg-calm-amber-900/60 border border-calm-amber-600/50 px-2.5 py-1 text-center text-xs font-bold text-calm-amber-300">
             {pauseMonths} {pauseMonths === 1 ? "Month" : "Months"}
           </span>
         </div>
       </div>
 
       {/* SVG Canvas Area */}
-      <div className="relative mt-3 w-full overflow-hidden rounded-lg bg-[#0e1117] p-2 border border-[#1e2433]">
+      <div className="relative mt-3.5 w-full overflow-hidden rounded-xl bg-[#0c0e12] p-2.5 border border-[#1e2433]">
         <svg
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           className="w-full h-auto"
@@ -286,7 +286,7 @@ export const DeficitSimulatorSVG: React.FC<DeficitSimulatorSVGProps> = ({
         </svg>
 
         {/* Legend */}
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-[#1e2433] pt-2 text-xs">
+        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-[#1e2433] pt-2.5 text-xs">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1.5">
               <span className="inline-block h-1.5 w-4 bg-[#486581] rounded"></span>
@@ -303,51 +303,51 @@ export const DeficitSimulatorSVG: React.FC<DeficitSimulatorSVGProps> = ({
               <span className="text-calm-green-400">Step-Down (Smart Alternative)</span>
             </div>
           </div>
-          <span className="text-[11px] text-slate-500 font-mono">
-            Actuarial CAGR: {(goal.projectedReturnRate * 100).toFixed(1)}%
+          <span className="text-[11px] text-slate-400 font-mono">
+            Projected CAGR: {(goal.projectedReturnRate * 100).toFixed(1)}%
           </span>
         </div>
       </div>
 
       {/* Real-Time Impact Metric Cards */}
-      <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Metric 1: Total Corpus Shortfall */}
-        <div className="rounded-lg border border-calm-amber-700/50 bg-calm-amber-900/20 p-2.5 text-left">
-          <span className="block text-[11px] text-calm-amber-300/80 font-medium">
-            Calculated Corpus Deficit
+        <div className="rounded-xl border border-calm-amber-700/50 bg-calm-amber-950/20 p-3 text-left">
+          <span className="block text-[11px] text-calm-amber-300 font-medium">
+            Calculated Corpus Shortfall
           </span>
-          <div className="mt-0.5 flex items-baseline space-x-1">
-            <span className="text-base font-bold text-calm-amber-300 font-mono">
+          <div className="mt-1 flex items-baseline space-x-1">
+            <span className="text-lg font-bold text-calm-amber-300 font-mono">
               -{formatInr(trajectory.totalDeficit)}
             </span>
           </div>
           <p className="text-[10px] text-slate-400 mt-0.5">
-            Compounded lost terminal value @ {goal.targetYear}
+            Lost terminal value at {goal.targetYear}
           </p>
         </div>
 
         {/* Metric 2: Milestone Delay */}
-        <div className="rounded-lg border border-[#282e3e] bg-[#1a1e29] p-2.5 text-left">
-          <span className="block text-[11px] text-slate-400 font-medium">
+        <div className="rounded-xl border border-[#282e3e] bg-[#1a1e29] p-3 text-left">
+          <span className="block text-[11px] text-slate-300 font-medium">
             Milestone Target Delay
           </span>
-          <div className="mt-0.5 flex items-baseline space-x-1">
-            <span className="text-base font-bold text-slate-200 font-mono">
+          <div className="mt-1 flex items-baseline space-x-1">
+            <span className="text-lg font-bold text-slate-100 font-mono">
               +{pauseMonths * 2} to {pauseMonths * 2 + 2} Months
             </span>
           </div>
           <p className="text-[10px] text-slate-400 mt-0.5">
-            Extended runway needed to reach {formatInr(goal.targetAmount)}
+            Runway extension needed to hit {formatInr(goal.targetAmount)}
           </p>
         </div>
 
         {/* Metric 3: Step-Down Corpus Protection */}
-        <div className="rounded-lg border border-calm-green-800/60 bg-calm-green-900/20 p-2.5 text-left">
+        <div className="rounded-xl border border-calm-green-800/60 bg-calm-green-950/30 p-3 text-left">
           <span className="block text-[11px] text-calm-green-300 font-medium flex items-center gap-1">
             <Sparkles className="h-3 w-3" /> Step-Down Shield
           </span>
-          <div className="mt-0.5 flex items-baseline space-x-1">
-            <span className="text-base font-bold text-calm-green-400 font-mono">
+          <div className="mt-1 flex items-baseline space-x-1">
+            <span className="text-lg font-bold text-calm-green-400 font-mono">
               +{formatInr(trajectory.protectedCorpus)}
             </span>
           </div>
@@ -359,3 +359,5 @@ export const DeficitSimulatorSVG: React.FC<DeficitSimulatorSVGProps> = ({
     </div>
   );
 };
+
+export default DeficitSimulatorSVG;

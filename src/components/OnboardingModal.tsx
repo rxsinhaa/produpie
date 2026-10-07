@@ -1,21 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import { BehavioralProfile, LifeGoal, QuestionItem } from "@/types";
-import { ONBOARDING_QUESTIONS } from "@/lib/constants";
+import { BehavioralProfile, LifeGoal } from "@/types";
+import { ONBOARDING_QUESTIONS, getFriendlyArchetypeInfo } from "@/lib/constants";
 import {
   ShieldCheck,
   Target,
-  Sliders,
-  HelpCircle,
   CheckCircle2,
   Lock,
   Plus,
   Trash2,
   ArrowRight,
+  ArrowLeft,
   Sparkles,
-  Key,
-  Globe,
+  HeartHandshake,
+  Compass,
+  Smile,
+  Zap,
 } from "lucide-react";
 
 interface OnboardingModalProps {
@@ -33,24 +34,24 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   goals,
   onSaveProfile,
 }) => {
-  const [step, setStep] = useState<"AUTH" | "GOALS" | "QUESTIONNAIRE" | "SUMMARY">("GOALS");
-  const [authMethod, setAuthMethod] = useState<string>("OAuth-Passkey");
+  const [step, setStep] = useState<"GOALS" | "QUESTIONNAIRE" | "SUMMARY">("GOALS");
   const [userGoals, setUserGoals] = useState<LifeGoal[]>(goals);
-  const [answers, setAnswers] = useState<Record<string, number>>(profile.answers || {
-    q1: 0.55,
-    q2: 0.6,
-    q3: 0.8,
-    q4: 0.6,
-  });
+  const [answers, setAnswers] = useState<Record<string, number>>(
+    profile.answers || {
+      q1: 0.55,
+      q2: 0.6,
+      q3: 0.8,
+      q4: 0.6,
+    }
+  );
 
   if (!isOpen) return null;
 
-  // Handle Answer Selection
   const handleSelectAnswer = (qId: string, weight: number) => {
     setAnswers((prev) => ({ ...prev, [qId]: weight }));
   };
 
-  // Calculate Continuous Risk Barrier from Answers
+  // Calculate Continuous Risk Barrier from Answers (preserves underlying math)
   const calculateBarrier = () => {
     const weights = Object.values(answers);
     if (weights.length === 0) return 0.6;
@@ -59,8 +60,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const calculatedRiskBarrier = calculateBarrier();
+  const archetypeInfo = getFriendlyArchetypeInfo(calculatedRiskBarrier);
 
-  // Goal modifications
   const handleUpdateGoal = (index: number, field: keyof LifeGoal, value: any) => {
     const updated = [...userGoals];
     updated[index] = { ...updated[index], [field]: value };
@@ -68,7 +69,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const handleAddGoal = () => {
-    if (userGoals.length >= 3) return;
+    if (userGoals.length >= 4) return;
     const newGoal: LifeGoal = {
       id: `goal-${Date.now()}`,
       title: "2035 Financial Independence",
@@ -88,17 +89,18 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const handleSaveAndComplete = () => {
-    let archetype: BehavioralProfile["archetype"] = "Anxious Aarav";
-    if (calculatedRiskBarrier >= 0.8) {
-      archetype = "Contrarian Accumulator";
-    } else if (calculatedRiskBarrier >= 0.65) {
-      archetype = "Disciplined Compounder";
+    // Map to profile while preserving archetype string compatibility
+    let legacyArchetype: BehavioralProfile["archetype"] = "Anxious Aarav";
+    if (calculatedRiskBarrier >= 0.75) {
+      legacyArchetype = "Contrarian Accumulator";
+    } else if (calculatedRiskBarrier >= 0.55) {
+      legacyArchetype = "Disciplined Compounder";
     }
 
     const updatedProfile: BehavioralProfile = {
       ...profile,
       riskBarrier: calculatedRiskBarrier,
-      archetype,
+      archetype: archetypeInfo.title as any,
       answers,
     };
 
@@ -107,91 +109,110 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl rounded-2xl border border-[#282e3e] bg-[#12151d] p-6 sm:p-8 shadow-2xl text-slate-100">
-        {/* Step Indicator */}
-        <div className="flex items-center justify-between border-b border-[#242938] pb-4">
-          <div>
-            <span className="rounded bg-calm-navy-900 border border-calm-navy-600 px-2 py-0.5 text-[10px] font-bold text-calm-navy-100 uppercase">
-              Phase 1: Foundation Calibration
-            </span>
-            <h2 className="mt-1 text-lg font-bold text-slate-100">
-              {step === "AUTH" && "Secure Zero-PII Authentication"}
-              {step === "GOALS" && "Goal Anchoring & Milestone Mapping"}
-              {step === "QUESTIONNAIRE" && "Behavioral Resilience & Risk Barrier Calibration"}
-              {step === "SUMMARY" && "Calibrated Compounding Profile"}
-            </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl border border-[#282e3e] bg-[#12151d] p-6 sm:p-8 shadow-2xl text-slate-100">
+        {/* Step Indicator Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#242938] pb-4">
+          <div className="flex items-center space-x-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#71649C] to-calm-navy-700 border border-[#71649C]/40 text-calm-amber-300 shadow-md">
+              <Compass className="h-5 w-5" />
+            </div>
+            <div>
+              <span className="rounded bg-[#71649C]/20 border border-[#71649C]/40 px-2 py-0.5 text-[10px] font-bold text-purple-300 uppercase tracking-wide">
+                Personalized Wealth Setup
+              </span>
+              <h2 className="mt-0.5 text-lg font-bold text-slate-100">
+                {step === "GOALS" && "Step 1: Your Life Milestones"}
+                {step === "QUESTIONNAIRE" && "Step 2: Understanding Your Investment Style"}
+                {step === "SUMMARY" && "Step 3: Your Personalized Plan"}
+              </h2>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-2 text-xs font-mono">
+          {/* Navigation Pills */}
+          <div className="flex items-center space-x-1.5 rounded-xl border border-[#282e3e] bg-[#0c0e12] p-1 text-xs">
             <button
               onClick={() => setStep("GOALS")}
-              className={`px-2.5 py-1 rounded ${
-                step === "GOALS" ? "bg-calm-navy-700 text-white font-bold" : "text-slate-400 hover:text-white"
-              }`}
-            >
-              1. Goals
-            </button>
-            <button
-              onClick={() => setStep("QUESTIONNAIRE")}
-              className={`px-2.5 py-1 rounded ${
-                step === "QUESTIONNAIRE"
-                  ? "bg-calm-navy-700 text-white font-bold"
+              className={`px-3 py-1 rounded-lg font-medium transition ${
+                step === "GOALS"
+                  ? "bg-[#71649C] text-white shadow-sm font-semibold"
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              2. Resilience
+              1. Milestones
+            </button>
+            <button
+              onClick={() => setStep("QUESTIONNAIRE")}
+              className={`px-3 py-1 rounded-lg font-medium transition ${
+                step === "QUESTIONNAIRE"
+                  ? "bg-[#71649C] text-white shadow-sm font-semibold"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              2. Style
             </button>
             <button
               onClick={() => setStep("SUMMARY")}
-              className={`px-2.5 py-1 rounded ${
-                step === "SUMMARY" ? "bg-calm-navy-700 text-white font-bold" : "text-slate-400 hover:text-white"
+              className={`px-3 py-1 rounded-lg font-medium transition ${
+                step === "SUMMARY"
+                  ? "bg-[#71649C] text-white shadow-sm font-semibold"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
-              3. Summary
+              3. Profile
             </button>
           </div>
         </div>
 
-        {/* STEP 1: GOALS ANCHORING */}
+        {/* STEP 1: LIFE MILESTONES ANCHORING */}
         {step === "GOALS" && (
-          <div className="mt-5 space-y-4">
-            <div className="rounded-xl border border-calm-navy-600/40 bg-calm-navy-900/30 p-3.5 text-xs text-slate-300">
-              <span className="font-semibold text-calm-amber-400">Anchoring Principle:</span> Define up to 3 life milestones with timeline and capital targets. The math engine uses these anchors to compute concrete milestone delay impacts rather than abstract percentage drops.
+          <div className="mt-6 space-y-5">
+            <div className="rounded-2xl border border-calm-navy-600/40 bg-gradient-to-r from-calm-navy-950/40 via-[#14171f] to-[#12151d] p-4 text-xs text-slate-300 flex items-start space-x-3">
+              <HeartHandshake className="h-5 w-5 text-calm-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-slate-100 text-sm block">What are you investing for?</strong>
+                <p className="text-slate-400 mt-0.5 leading-relaxed">
+                  Anchor your monthly SIPs to real-life dreams (like a new home, education, or financial freedom). Whenever markets get rocky, our AI co-pilot shows how your timeline is affected instead of confusing you with abstract financial jargon.
+                </p>
+              </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {userGoals.map((goal, idx) => (
                 <div
                   key={goal.id}
-                  className="rounded-xl border border-[#282e3e] bg-[#161a24] p-4 space-y-3"
+                  className="rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 sm:p-5 space-y-3 shadow-md hover:border-slate-600 transition"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-calm-amber-400 font-mono">
-                      Milestone #{idx + 1}
+                    <span className="text-xs font-bold text-calm-amber-400 font-mono tracking-wide">
+                      🎯 Milestone #{idx + 1}
                     </span>
                     {userGoals.length > 1 && (
                       <button
                         onClick={() => handleRemoveGoal(idx)}
-                        className="text-xs text-slate-500 hover:text-calm-amber-400 p-1"
+                        className="text-xs text-slate-500 hover:text-calm-amber-400 p-1 transition"
+                        title="Remove milestone"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
                     <div>
-                      <label className="block text-slate-400 mb-1">Milestone Name</label>
+                      <label className="block text-slate-300 font-medium mb-1">
+                        Milestone Name
+                      </label>
                       <input
                         type="text"
                         value={goal.title}
                         onChange={(e) => handleUpdateGoal(idx, "title", e.target.value)}
-                        className="w-full rounded-lg border border-[#282e3e] bg-[#0c0e12] px-3 py-2 text-slate-100 font-medium focus:outline-none focus:border-calm-amber-500"
+                        placeholder="e.g. 2032 Dream Home"
+                        className="w-full rounded-xl border border-[#282e3e] bg-[#0c0e12] px-3.5 py-2.5 text-slate-100 font-medium focus:outline-none focus:border-[#71649C] focus:ring-1 focus:ring-[#71649C] transition"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-400 mb-1">Target Year</label>
+                      <label className="block text-slate-300 font-medium mb-1">Target Year</label>
                       <input
                         type="number"
                         min="2027"
@@ -200,11 +221,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         onChange={(e) =>
                           handleUpdateGoal(idx, "targetYear", parseInt(e.target.value) || 2032)
                         }
-                        className="w-full rounded-lg border border-[#282e3e] bg-[#0c0e12] px-3 py-2 text-slate-100 font-mono font-medium focus:outline-none focus:border-calm-amber-500"
+                        className="w-full rounded-xl border border-[#282e3e] bg-[#0c0e12] px-3.5 py-2.5 text-slate-100 font-mono font-medium focus:outline-none focus:border-[#71649C] focus:ring-1 focus:ring-[#71649C] transition"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-400 mb-1">Target Corpus (₹)</label>
+                      <label className="block text-slate-300 font-medium mb-1">
+                        Target Corpus (₹)
+                      </label>
                       <input
                         type="number"
                         step="100000"
@@ -212,74 +235,94 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         onChange={(e) =>
                           handleUpdateGoal(idx, "targetAmount", parseInt(e.target.value) || 2500000)
                         }
-                        className="w-full rounded-lg border border-[#282e3e] bg-[#0c0e12] px-3 py-2 text-slate-100 font-mono font-medium focus:outline-none focus:border-calm-amber-500"
+                        className="w-full rounded-xl border border-[#282e3e] bg-[#0c0e12] px-3.5 py-2.5 text-slate-100 font-mono font-medium focus:outline-none focus:border-[#71649C] focus:ring-1 focus:ring-[#71649C] transition"
                       />
                     </div>
                   </div>
                 </div>
               ))}
 
-              {userGoals.length < 3 && (
+              {userGoals.length < 4 && (
                 <button
                   onClick={handleAddGoal}
-                  className="flex w-full items-center justify-center space-x-2 rounded-xl border border-dashed border-[#38425d] bg-[#14171f] py-3 text-xs font-semibold text-slate-300 hover:border-calm-amber-500 hover:text-calm-amber-300 transition"
+                  className="flex w-full items-center justify-center space-x-2 rounded-2xl border border-dashed border-[#38425d] bg-[#14171f] py-3.5 text-xs font-semibold text-slate-300 hover:border-[#71649C] hover:text-purple-300 transition active:scale-99"
                 >
                   <Plus className="h-4 w-4" />
-                  <span>Add Life Milestone (Max 3)</span>
+                  <span>Add Another Milestone (Max 4)</span>
                 </button>
               )}
             </div>
 
-            <div className="flex justify-end pt-3">
+            <div className="flex items-center justify-between pt-4 border-t border-[#242938]">
+              <button
+                onClick={onClose}
+                className="rounded-xl border border-[#282e3e] px-4 py-2.5 text-xs text-slate-400 hover:text-slate-200 transition"
+              >
+                Skip for now
+              </button>
               <button
                 onClick={() => setStep("QUESTIONNAIRE")}
-                className="flex items-center space-x-2 rounded-xl bg-calm-navy-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-calm-navy-500 transition shadow"
+                className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-[#71649C] to-[#594d80] px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-[#71649C]/25 hover:brightness-110 active:scale-98 transition"
               >
-                <span>Continue to Resilience Calibration</span>
+                <span>Continue to Investment Style</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 2: BEHAVIORAL QUESTIONNAIRE */}
+        {/* STEP 2: EMPATHETIC & CONVERSATIONAL QUESTIONNAIRE */}
         {step === "QUESTIONNAIRE" && (
-          <div className="mt-5 space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-            <div className="rounded-xl border border-calm-navy-600/40 bg-calm-navy-900/30 p-3 text-xs text-slate-300">
-              <span className="font-semibold text-calm-amber-400">Prospect Theory Calibration:</span> Answer these 4 behavioral scenarios. The RAG/Math engine scales your personalized baseline <strong>Risk Barrier</strong> from <code className="font-mono text-calm-amber-300">0.0 → 1.0</code>.
+          <div className="mt-6 space-y-5 max-h-[60vh] overflow-y-auto pr-1">
+            <div className="rounded-2xl border border-calm-navy-600/40 bg-gradient-to-r from-calm-navy-950/40 via-[#14171f] to-[#12151d] p-4 text-xs text-slate-300 flex items-start space-x-3">
+              <Sparkles className="h-5 w-5 text-calm-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-slate-100 text-sm block">Understanding Your Investment Style</strong>
+                <p className="text-slate-400 mt-0.5 leading-relaxed">
+                  These quick questions help us tailor calming, smart nudges during market volatility so you never feel overwhelmed or pressured into emotional decisions.
+                </p>
+              </div>
             </div>
 
             {ONBOARDING_QUESTIONS.map((q, qIdx) => (
               <div
                 key={q.id}
-                className="rounded-xl border border-[#282e3e] bg-[#161a24] p-4 space-y-3"
+                className="rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 sm:p-5 space-y-3.5 shadow-md"
               >
                 <div>
-                  <span className="text-[10px] font-bold text-calm-navy-100 uppercase tracking-wide">
-                    Scenario #{qIdx + 1}
+                  <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider">
+                    Question {qIdx + 1} of 4
                   </span>
-                  <h4 className="text-sm font-semibold text-slate-100">{q.scenario}</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">{q.description}</p>
+                  <h4 className="text-sm sm:text-base font-bold text-slate-100 mt-0.5">
+                    {q.scenario}
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                    {q.description}
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {q.options.map((opt, oIdx) => {
                     const isSelected = answers[q.id] === opt.weight;
                     return (
                       <button
                         key={oIdx}
                         onClick={() => handleSelectAnswer(q.id, opt.weight)}
-                        className={`rounded-lg border p-2.5 text-left text-xs transition ${
+                        className={`rounded-xl border p-3.5 text-left text-xs transition active:scale-98 ${
                           isSelected
-                            ? "border-calm-amber-500 bg-calm-amber-950/40 text-calm-amber-200 shadow"
-                            : "border-[#282e3e] bg-[#0c0e12] text-slate-400 hover:border-slate-600"
+                            ? "border-calm-amber-500 bg-calm-amber-950/30 text-slate-100 shadow-md shadow-amber-950/40 ring-1 ring-calm-amber-500/50"
+                            : "border-[#282e3e] bg-[#0c0e12] text-slate-400 hover:border-slate-600 hover:text-slate-200"
                         }`}
                       >
-                        <div className="flex items-start justify-between">
-                          <span className="font-medium text-slate-200">{opt.label}</span>
-                          {isSelected && <CheckCircle2 className="h-4 w-4 text-calm-amber-400 shrink-0 ml-1" />}
+                        <div className="flex items-start justify-between gap-2">
+                          <span className={`font-semibold ${isSelected ? "text-calm-amber-300" : "text-slate-200"}`}>
+                            {opt.label}
+                          </span>
+                          {isSelected && (
+                            <CheckCircle2 className="h-4 w-4 text-calm-amber-400 shrink-0 mt-0.5" />
+                          )}
                         </div>
-                        <span className="text-[10px] text-slate-500 mt-1 block">
+                        <span className="text-[11px] text-slate-400 mt-1.5 block leading-relaxed">
                           {opt.description}
                         </span>
                       </button>
@@ -289,79 +332,95 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
             ))}
 
-            <div className="flex justify-between pt-3 border-t border-[#242938]">
+            <div className="flex items-center justify-between pt-4 border-t border-[#242938]">
               <button
                 onClick={() => setStep("GOALS")}
-                className="rounded-xl border border-[#282e3e] px-4 py-2 text-xs text-slate-400 hover:text-slate-200"
+                className="flex items-center space-x-1.5 rounded-xl border border-[#282e3e] px-4 py-2.5 text-xs text-slate-400 hover:text-slate-200 transition"
               >
-                Back to Goals
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to Milestones</span>
               </button>
               <button
                 onClick={() => setStep("SUMMARY")}
-                className="flex items-center space-x-2 rounded-xl bg-calm-navy-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-calm-navy-500 transition shadow"
+                className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-[#71649C] to-[#594d80] px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-[#71649C]/25 hover:brightness-110 active:scale-98 transition"
               >
-                <span>View Calibrated Risk Barrier</span>
+                <span>View Your Profile</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 3: SUMMARY & CONFIRMATION */}
+        {/* STEP 3: FRIENDLY ARCHETYPE SUMMARY */}
         {step === "SUMMARY" && (
-          <div className="mt-5 space-y-4">
-            <div className="rounded-xl border border-calm-green-600/50 bg-calm-green-950/30 p-4 text-center">
-              <span className="inline-block rounded bg-calm-green-500/20 border border-calm-green-500/40 px-2 py-0.5 text-[10px] font-bold text-calm-green-300 uppercase">
-                Calibration Ready
+          <div className="mt-6 space-y-5">
+            {/* Friendly Archetype Card */}
+            <div className="rounded-3xl border border-[#71649C]/40 bg-gradient-to-b from-[#71649C]/20 via-[#161a24] to-[#12151d] p-6 text-center space-y-3 shadow-xl">
+              <span className="inline-block rounded-full bg-[#71649C]/30 border border-[#71649C]/60 px-3 py-1 text-[11px] font-bold text-purple-200 uppercase tracking-wider">
+                {archetypeInfo.badge}
               </span>
-              <h3 className="mt-2 text-2xl font-black font-mono text-calm-amber-400">
-                Risk Barrier: {calculatedRiskBarrier.toFixed(2)}
+
+              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                Your Profile: <span className="text-calm-amber-300">{archetypeInfo.title}</span>
               </h3>
-              <p className="mt-1 text-xs text-slate-300">
-                Archetype:{" "}
-                <strong className="text-white">
-                  {calculatedRiskBarrier < 0.65 ? "Anxious Aarav (Loss-Sensitive)" : "Disciplined Compounder"}
-                </strong>
+
+              <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+                {archetypeInfo.summary}
               </p>
+
+              <div className="inline-flex items-center space-x-2 rounded-xl bg-[#0c0e12]/80 border border-[#282e3e] px-3.5 py-1.5 text-xs text-slate-400 font-medium">
+                <Sparkles className="h-4 w-4 text-calm-amber-400" />
+                <span>{archetypeInfo.tagline}</span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="rounded-xl border border-[#282e3e] bg-[#161a24] p-3.5 space-y-1">
-                <span className="text-slate-400">Anchored Milestones:</span>
-                <ul className="space-y-1 pt-1">
+            {/* Anchored Milestones Overview */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+              <div className="rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 space-y-2">
+                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">
+                  Your Anchored Milestones:
+                </span>
+                <ul className="space-y-2 pt-1">
                   {userGoals.map((g) => (
-                    <li key={g.id} className="text-slate-200 font-medium">
-                      • {g.title} ({g.targetYear}) — ₹{(g.targetAmount / 100000).toFixed(1)} Lakhs
+                    <li key={g.id} className="flex items-center justify-between text-slate-200">
+                      <span className="font-medium">• {g.title}</span>
+                      <span className="font-mono text-calm-amber-400 font-semibold">
+                        {g.targetYear} (₹{(g.targetAmount / 100000).toFixed(1)}L)
+                      </span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="rounded-xl border border-[#282e3e] bg-[#161a24] p-3.5 space-y-1">
-                <span className="text-slate-400">Zero-PII Token Status:</span>
-                <div className="flex items-center space-x-1.5 text-calm-green-400 font-mono text-[11px] pt-1">
-                  <Lock className="h-3.5 w-3.5" />
-                  <span>{profile.sessionToken}</span>
+              <div className="rounded-2xl border border-[#282e3e] bg-[#161a24] p-4 space-y-2">
+                <span className="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]">
+                  Privacy & Guardrails:
+                </span>
+                <div className="flex items-center space-x-2 text-calm-green-400 font-medium text-xs pt-1">
+                  <CheckCircle2 className="h-4 w-4 shrink-0" />
+                  <span>Zero-PII Anonymized Session</span>
                 </div>
-                <p className="text-[10px] text-slate-500">
-                  No PAN, bank accounts, or personal identities ingested or stored.
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  No bank credentials or PAN numbers are ever stored. Your data stays 100% private.
                 </p>
               </div>
             </div>
 
-            <div className="flex justify-between pt-3 border-t border-[#242938]">
+            {/* Finish and Enter Dashboard CTA */}
+            <div className="flex items-center justify-between pt-4 border-t border-[#242938]">
               <button
                 onClick={() => setStep("QUESTIONNAIRE")}
-                className="rounded-xl border border-[#282e3e] px-4 py-2 text-xs text-slate-400 hover:text-slate-200"
+                className="flex items-center space-x-1.5 rounded-xl border border-[#282e3e] px-4 py-2.5 text-xs text-slate-400 hover:text-slate-200 transition"
               >
-                Back to Questionnaire
+                <ArrowLeft className="h-4 w-4" />
+                <span>Adjust Answers</span>
               </button>
               <button
                 onClick={handleSaveAndComplete}
-                className="flex items-center space-x-2 rounded-xl bg-calm-green-600 px-6 py-2.5 text-xs font-bold text-white hover:bg-calm-green-500 transition shadow"
+                className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-calm-green-600 to-emerald-600 px-7 py-3 text-xs font-bold text-white shadow-xl shadow-green-900/30 hover:brightness-110 active:scale-98 transition"
               >
                 <CheckCircle2 className="h-4 w-4" />
-                <span>Save Anchors & Enter Dashboard</span>
+                <span>Save Profile & Enter Dashboard</span>
               </button>
             </div>
           </div>
@@ -370,3 +429,5 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     </div>
   );
 };
+
+export default OnboardingModal;
