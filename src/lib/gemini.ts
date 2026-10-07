@@ -1,9 +1,23 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { LifeGoal, PortfolioHealth, SipHolding, BehavioralProfile } from "@/types";
 
-// Initialize Gemini Client
-const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+// Dynamically retrieve Gemini Client to ensure fresh environment variable resolution
+function getGenAIClient(): GoogleGenerativeAI | null {
+  const key = (
+    process.env.GEMINI_API_KEY ||
+    process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
+    ""
+  ).trim();
+  if (!key || key === "your_google_gemini_api_key_here") {
+    return null;
+  }
+  try {
+    return new GoogleGenerativeAI(key);
+  } catch (err) {
+    console.warn("Failed to instantiate GoogleGenerativeAI:", err);
+    return null;
+  }
+}
 
 export interface PrePauseReportParams {
   fundName: string;
@@ -78,6 +92,7 @@ Structure requirements:
 - Keep total length under 140 words. Use empathetic but firm, professional tone. Avoid generic filler.
 `;
 
+    const genAI = getGenAIClient();
     if (genAI) {
       try {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -87,7 +102,17 @@ Structure requirements:
           return { report: text.trim(), modelUsed: "gemini-1.5-flash", isAiGenerated: true };
         }
       } catch (err) {
-        console.warn("Gemini API call failed, falling back to deterministic response:", err);
+        console.warn("Gemini Flash call failed, attempting fallback:", err);
+        try {
+          const modelPro = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+          const resultPro = await modelPro.generateContent(prompt);
+          const textPro = resultPro.response.text();
+          if (textPro && textPro.trim().length > 30) {
+            return { report: textPro.trim(), modelUsed: "gemini-1.5-pro", isAiGenerated: true };
+          }
+        } catch (err2) {
+          console.warn("Gemini API call failed, falling back to deterministic response:", err2);
+        }
       }
     }
 
@@ -163,6 +188,7 @@ Include these exact sections:
 Tone: Sophisticated, quantitative, empathetic, and encouraging. Use bold key metrics.
 `;
 
+    const genAI = getGenAIClient();
     if (genAI) {
       try {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
@@ -238,6 +264,7 @@ Output Requirements: Return ONLY a valid raw JSON object with these exact keys:
 }
 `;
 
+    const genAI = getGenAIClient();
     if (genAI) {
       try {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
